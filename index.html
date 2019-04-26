@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>ERIS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+  $(function(){
+    var includes = $('[data-include]');
+    jQuery.each(includes, function(){
+      var file = 'externalHTML/' + $(this).data('include') + '.html';
+      $(this).load(file);
+    });
+  });
+</script>
+
+</head>
+
+<body>
+
+<div data-include="simulation"></div> 
+
+</body>
+</html>
