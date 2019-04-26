@@ -1,7 +1,3 @@
-.mySim {
-	margin:auto;
-}
-
 .output_wrapper {
 	margin: auto;
 }
@@ -18,11 +14,19 @@
 	margin: auto;
 }
 
-.output_subarea output_javascript {
+.output_subarea {
 	margin: auto;
 }
 
-.output_html rendered_html output_subarea {
+.output_javascript {
+	margin: auto;
+}
+
+.output_html {
+	margin: auto;
+}
+
+.rendered_html {
 	margin: auto;
 }
 
