@@ -15,3 +15,7 @@
 .customTextInput, .bk-widget-form-input {
     width: 65px;
 }
+
+.bk-slider-value {
+	visibility: hidden;
+}
