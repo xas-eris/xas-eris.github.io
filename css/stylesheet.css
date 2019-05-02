@@ -12,6 +12,6 @@
 	margin: auto;
 }
 
-.customTextInput .bk-widget-form-input {
-    width: 50px;
+.customTextInput, .bk-widget-form-input {
+    width: 65px;
 }
