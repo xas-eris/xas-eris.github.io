@@ -7,12 +7,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="js/convertToCSS.js"></script>
 <script type="js/includeHTML.js"></script>
+<script>
+var mydata = [  
+        {
+            Symbol: "AAPL",
+            Company: "Apple Inc.",
+            Price: 132.54
+        },
+        {
+            Symbol: "INTC",
+            Company: "Intel Corporation",
+            Price: 33.45
+        },
+        {
+            Symbol: "GOOG",
+            Company: "Google Inc",
+            Price: 554.52
+        },
+    ];
+</script>
 
 </head>
 
 <body>
 
 <div style="margin:auto" data-include="simulationFile"></div> 
+
+<a href='#' 
+        onclick='downloadCSV({ filename: "output.csv" });'
+    >[TEST] Download CSV Output [TEST]</a>
 
 </body>
 </html>
