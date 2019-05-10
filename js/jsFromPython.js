@@ -1,4 +1,3 @@
-var xx = 8;
 var element = $('#ef202bab-ee74-4fc1-928d-cf79d3cb89cd');
 (function(root) {
   function embed_document(root) {
