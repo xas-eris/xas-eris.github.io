@@ -27,3 +27,5 @@ var docs_json = {};
 })(window);
 
 embed_document();
+
+var xx = 8;
