@@ -4,8 +4,10 @@
 
 <link rel="stylesheet" href="css/stylesheet.css" />
 
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script>
+<!--<script>
 $(function(){
   var includes = $('[data-include]');
   jQuery.each(includes, function(){
@@ -13,7 +15,7 @@ $(function(){
     $(this).load(file);
   });
 });
-</script>
+</script>-->
 <script>
 var mydata = [  
         {
@@ -85,21 +87,66 @@ function downloadCSV(args) {
     }
 </script>
 
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
 </head>
 
 <body>
 
-<div style="margin:auto" data-include="simulationFile"></div> 
+<!--<div style="margin:auto" data-include="simulationFile"></div> 
 
 <a href='#' 
         onclick='downloadCSV({ filename: "output.csv" });'
-    >[TEST] Download CSV Output [TEST]</a>
+    >[TEST] Download CSV Output [TEST]</a>-->
 
-<div> rrestarted* </div>
-
-<script>
-window.alert('e');
-</script>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+    <div class="prompt"></div>
+<div id="6ed730d7-2fd8-4b59-bc46-e63b6bc980b3"></div>
+<div class="output_subarea output_javascript ">
+<script type="text/javascript" src="js/jsFromPython_dontTouch"></script>
+</div>
+</div>
+<div class="output_area">
+    <div class="prompt"></div>
+<div class="output_html rendered_html output_subarea ">
+  <div class="bk-root" id="d26f18ce-60a8-4829-99ef-f13ba34b6869"></div>
+</div>
+</div>
+<div class="output_area">
+    <div class="prompt"></div>
+<div id="ef202bab-ee74-4fc1-928d-cf79d3cb89cd"></div>
+<div class="output_subarea output_javascript ">
+<script type="text/javascript" src="js/jsFromPython.js></script>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+  </div>
 
 </body>
 </html>
