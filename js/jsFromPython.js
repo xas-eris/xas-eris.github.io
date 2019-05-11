@@ -15,7 +15,6 @@ var element = $('#ef202bab-ee74-4fc1-928d-cf79d3cb89cd');
       if (root.Bokeh !== undefined) {
         embed_document(root);
         clearInterval(timer);
-	var xx = 12;
       }
       attempts++;
       if (attempts > 100) {
