@@ -16,7 +16,6 @@ var element = $('#ef202bab-ee74-4fc1-928d-cf79d3cb89cd');
         embed_document(root);
         clearInterval(timer);
 	xx = 12;
-	alert(xx);
       }
       attempts++;
       if (attempts > 100) {
