@@ -1,21 +1,3 @@
-.prompt,
-.output,
-.output_wrapper,
-.output_area,
-.output_subarea,
-.output_javascript,
-.output_html,
-.rendered_html,
-.bk-grid,
-.bk-root,
-.bk-grid-row {
-	margin: auto;
-}
-
-.customTextInput, .bk-widget-form-input {
-    width: 65px;
-}
-
 .bk-slider-value {
 	visibility: hidden;
 }
