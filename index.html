@@ -1,138 +1,43 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<title>Eris</title>
+<meta charset="utf-8">
+<title>1 Corinthians 14 : 33</title>
 
-<link rel="stylesheet" href="css/stylesheet.css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-1.2.0.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.2.0.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.2.0.min.css" type="text/css" />
+<link rel="stylesheet" href="css/stylesheet.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.2.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.2.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.2.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-gl-1.2.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-api-1.2.0.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<!--<script>
-var mydata = [  
-        {
-            Symbol: "test",
-            Company: "1",
-            Price: 132.54
-        },
-        {
-            Symbol: "testt",
-            Company: "2",
-            Price: 33.45
-        },
-        {
-            Symbol: "testtt",
-            Company: "3",
-            Price: 554.52
-        },
-    ];
-
-function convertArrayOfObjectsToCSV(args) {  
-        var result, ctr, keys, columnDelimiter, lineDelimiter, data;
-
-        data = args.data || null;
-        if (data == null || !data.length) {
-            return null;
-        }
-
-        columnDelimiter = args.columnDelimiter || ',';
-        lineDelimiter = args.lineDelimiter || '\n';
-
-        keys = Object.keys(data[0]);
-
-        result = '';
-        result += keys.join(columnDelimiter);
-        result += lineDelimiter;
-
-        data.forEach(function(item) {
-            ctr = 0;
-            keys.forEach(function(key) {
-                if (ctr > 0) result += columnDelimiter;
-
-                result += item[key];
-                ctr++;
-            });
-            result += lineDelimiter;
-        });
-
-        return result;
-    }
-
-function downloadCSV(args) {  
-        var data, filename, link;
-        var csv = convertArrayOfObjectsToCSV({
-            data: mydata
-        });
-        if (csv == null) return;
-
-        filename = args.filename || 'export.csv';
-
-        if (!csv.match(/^data:text\/csv/i)) {
-            csv = 'data:text/csv;charset=utf-8,' + csv;
-        }
-        data = encodeURI(csv);
-
-        link = document.createElement('a');
-        link.setAttribute('href', data);
-        link.setAttribute('download', filename);
-        link.click();
-    }
-</script>-->
-
-<!-- Loading mathjax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
-<!-- MathJax configuration -->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-    tex2jax: {
-        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-        processEscapes: true,
-        processEnvironments: true
-    },
-    // Center justify equations in code and markdown cells. Elsewhere
-    // we use CSS to left justify single line equations in code cells.
-    displayAlign: 'center',
-    "HTML-CSS": {
-        styles: {'.MathJax_Display': {"margin": 0}},
-        linebreaks: { automatic: true }
-    }
-});
-</script><!-- End of mathjax configuration -->
 
 </head>
 
 <body>
 
-<div class="output_wrapper">
-<div class="output">
-<div class="output_area">
-    <div class="prompt"></div>
-<div id="ffc57fa9-4878-4faa-b550-da9fe0a3e43f"></div>
-<div class="output_subarea output_javascript ">
-<script type="text/javascript" src="js/jsFromPython_dontTouch.js"></script>
-</div>
-</div>
-<div class="output_area">
-    <div class="prompt"></div>
-<div class="output_html rendered_html output_subarea ">
-  <div class="bk-root" id="aa117bc0-51a5-46af-a25b-59093c35ecc6"></div>
-</div>
-</div>
-<div class="output_area">
-    <div class="prompt"></div>
-<div id="54ae31a7-8ff7-4ded-889e-2e865fcd72bd"></div>
-<div class="output_subarea output_javascript ">
-<script type="text/javascript" src="js/jsFromPython2.js"></script>
-</div>
-</div>
-</div>
-</div>
-</div>
-    </div>
-  </div>
+<input type="file" id="myFile" />
 
-<!--<a href='#' onclick='downloadCSV({ filename: "output.csv" });'>
-[TEST] Download CSV Output [TEST]
-</a>-->
+<div class="slidecontainer">
+<input type="range" id="alphaSlider" min="0" max="1" step="0.01" value="0" oninput="showVal(this.value,'aValBox')" onchange="showVal(this.value,'aValBox')" class="slider"/>
+<span id="aValBox"> </span>
+</div>
+
+<div class="slidecontainer">
+<input type="range" id="thicknessFactorSlider" min="0.1" max="5" step="0.01" value="1" oninput="showVal(this.value,'tValBox')" onchange="showVal(this.value,'tValBox')" class="slider"/>
+<span id="tValBox"> </span>
+</div>
+
+<script src="js/init_data.js"></script>
+<script src="js/update_data.js"></script>
+
 
 </body>
+
 </html>
