@@ -18,7 +18,7 @@ $("#myFile").change(function(e){
 	var myFile = this.files[0];
 	readFile(myFile, function(e) {
 
-	dataStr = e.target.result;
+	var dataStr = e.target.result;
 	var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
 
 	//find the index of the last pound sign:

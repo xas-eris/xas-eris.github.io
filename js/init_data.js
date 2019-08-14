@@ -37,8 +37,7 @@ $(document).ready(function(){
 	
 	readFile(request.response, function(e) {
 
-	dataStr = e.target.result;
-	console.log(typeof dataStr);
+	var dataStr = e.target.result;
 	var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
 
 	//find the index of the last pound sign:
@@ -71,7 +70,7 @@ $(document).ready(function(){
 		else if (HeaderList[ii] === "i0") {
 			var i0Index = ii - 1 ;
 		}
-		else if (HeaderList[ii] === "itrans") {
+		else if (HeaderList[ii] === "itrans" || HeaderList[ii] === "itran") {
 			var itransIndex = ii - 1 ;
 		}
 	}
