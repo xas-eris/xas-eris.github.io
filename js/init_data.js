@@ -30,9 +30,7 @@ $(document).ready(function(){
 	});
 
   var request = new XMLHttpRequest();
-	console.log('3');
   request.open('GET', "https://xas-eris.com/V2O5.txt", true);
-	console.log('4');
   request.responseType = 'blob';
 
   request.onload = function () {
@@ -40,6 +38,7 @@ $(document).ready(function(){
 	readFile(request.response, function(e) {
 
 	dataStr = e.target.result;
+	console.log(dataStr);
 	var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
 
 	//find the index of the last pound sign:
