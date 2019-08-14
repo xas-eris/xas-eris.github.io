@@ -38,6 +38,7 @@ $(document).ready(function(){
 	readFile(request.response, function(e) {
 
 	dataStr = e.target.result;
+	console.log(dataStr);
 	var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
 
 	//find the index of the last pound sign:
