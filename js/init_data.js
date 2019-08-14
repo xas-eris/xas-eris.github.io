@@ -30,7 +30,7 @@ $(document).ready(function(){
 	});
 
   var request = new XMLHttpRequest();
-  request.open('GET', "http://localhost:8000/space_dust_V2O5.txt", true);
+  request.open('GET', "space_dust_V2O5.txt", true);
   request.responseType = 'blob';
 
   request.onload = function () {
