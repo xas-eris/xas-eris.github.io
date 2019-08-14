@@ -31,7 +31,7 @@ $(document).ready(function(){
 
   var request = new XMLHttpRequest();
 	console.log('3');
-  request.open('GET', "http://cars.uchicago.edu/xaslib/rawfile/785/V2O5.xdi", true);
+  request.open('GET', "https://xas-eris.com/V2O5q.txt", true);
 	console.log('4');
   request.responseType = 'blob';
 
