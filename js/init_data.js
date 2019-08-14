@@ -31,7 +31,7 @@ $(document).ready(function(){
 
   var request = new XMLHttpRequest();
 	console.log('3');
-  request.open('GET', "https://xas-eris.com/V2O5q.txt", true);
+  request.open('GET', "https://xas-eris.com/V2O5.txt", true);
 	console.log('4');
   request.responseType = 'blob';
 
