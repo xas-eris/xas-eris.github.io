@@ -30,7 +30,7 @@ $(document).ready(function(){
 	});
 
   var request = new XMLHttpRequest();
-  request.open('GET', "https://xas-eris.com/V2O5.txt", true);
+  request.open('GET', "http://cars.uchicago.edu/xaslib/rawfile/785/V2O5.xdi", true);
   request.responseType = 'blob';
 
   request.onload = function () {
