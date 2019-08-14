@@ -8,6 +8,7 @@
 
 .slidecontainer {
   width: 40%;
+  display: inline-flex;
 }
 
 .slider {
