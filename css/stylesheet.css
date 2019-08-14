@@ -8,10 +8,10 @@
 
 .slidecontainer {
   width: 40%;
-  display: inline-flex;
 }
 
 .slider {
+  display: inline-flex;
   -webkit-appearance: none;
   width: 100%;
   height: 15px;
