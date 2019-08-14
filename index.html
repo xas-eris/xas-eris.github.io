@@ -22,16 +22,20 @@
 
 <body>
 
-<input type="file" id="myFile" />
+<div style="display: block">
 
-<div class="slidecontainer">
-<input type="range" id="alphaSlider" min="0" max="1" step="0.01" value="0" oninput="showVal(this.value,'aValBox')" onchange="showVal(this.value,'aValBox')" class="slider"/>
-<span id="aValBox"> </span>
-</div>
+	<input type="file" id="myFile" />
 
-<div class="slidecontainer">
-<input type="range" id="thicknessFactorSlider" min="0.1" max="5" step="0.01" value="1" oninput="showVal(this.value,'tValBox')" onchange="showVal(this.value,'tValBox')" class="slider"/>
-<span id="tValBox"> </span>
+	<div class="slidecontainer">
+	<input type="range" id="alphaSlider" min="0" max="1" step="0.01" value="0" oninput="showVal(this.value,'aValBox')" onchange="showVal(this.value,'aValBox')" class="slider"/>
+	<span id="aValBox"> </span>
+	</div>
+
+	<div class="slidecontainer">
+	<input type="range" id="thicknessFactorSlider" min="0.1" max="5" step="0.01" value="1" oninput="showVal(this.value,'tValBox')" onchange="showVal(this.value,'tValBox')" class="slider"/>
+	<span id="tValBox"> </span>
+	</div>
+
 </div>
 
 <script src="js/init_data.js"></script>
