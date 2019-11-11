@@ -17,6 +17,9 @@ $(document).ready(function(){
   window.muListP = [];
   window.alpha = 0;
   window.thicknessFactor = 1;
+
+  window.fwhm = 0.1;
+
   window.tools = "pan,wheel_zoom,box_zoom,reset,save";
   window.xdr = new Bokeh.Range1d({ start: 5350, end: 5600 });
   window.ydr = new Bokeh.Range1d({ start: -1, end: 1.2 });

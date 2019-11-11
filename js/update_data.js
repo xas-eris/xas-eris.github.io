@@ -114,10 +114,10 @@ $("#myFile").change(function(e){
 
 	});
 });
-/////////////////////////////////
-// CODE FOR A CHANGE IN ALPHA: //
-/////////////////////////////////
-$("#alphaSlider").on('input', function(e) { 
+//////////////////////////////////////////////////////////////////////
+// CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
+//////////////////////////////////////////////////////////////////////
+$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider").on('input', function(e) { 
 	$( ".bk-root" ).empty();
 
 	window.xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
@@ -132,83 +132,84 @@ $("#alphaSlider").on('input', function(e) {
 	});
 
 	alpha = Number(document.getElementById("alphaSlider").value);	
+	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
+	fwhm = Number(document.getElementById("lorentzianSlider").value);	
 	muListP = [];
 
-	for (var ii = 0; ii < energyList.length ; ii++) {		
-		var modifiedItransValue = alpha + (1-alpha) * Math.pow(Math.E, - thicknessFactor * muList[ii]);
-		muListP.push( - Math.log(modifiedItransValue));
-	}
-
-/////////////////////////////////////////////// NORMALIZE:
-	// first determine the index corresponding to the first energy value greater than 5500:
-        var index = -1;
-        energyList.some(function(el, i) {
-            if (el > 5500) {
-                index = i;
-                return true;
-            }
-        });
-        
-        var diff = muListP[index] - muListP[0];
-        for (var i = 0; i < energyList.length; i++) {
-            if (alpha != 1) {
-                muListP[i] /= diff;
+	// Choose deltaE, the horizontal separation between points in the interpolated data, to be the smallest existing separation between points in the non-interpolated data:
+        var deltaE = "";
+        for (var i = 1; i < energyList.length; i++) {
+            if (Math.abs(energyList[i] - energyList[i-1]) < deltaE || deltaE === ""){
+                deltaE = energyList[i] - energyList[i-1];
             }
         }
 
-	// subtract vertical offset:
-	var b = muListP[0];
-	for (var i = 0; i < energyList.length; i++) {
-	    muListP[i] -= b;
-	}
-///////////////////////////////////////////////
+        // The number of points in the interpolated data:
+        arrayLength = Math.floor( (energyList[energyList.length - 1] - energyList[0]) / deltaE );
 
-	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muList }
-	});
+        // Create a list of the interpolated energy values:
+        var interpolatedEnergyList = [];
+        var firstEnergyValue = Math.ceil(energyList[0]);
+        for (var i = 0; i < arrayLength; i++) {
+            interpolatedEnergyList.push(firstEnergyValue + i * deltaE);
+        }
 
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: source,
-		line_color: "Red",
-		line_width: 2
-	});
+        // Create a list of thicknessFactor-dependent, and alpha-dependent, simulated IT data:
+        var simulatedITList = [];
+        for (var i = 0; i < energyList.length; i++) {
+            simulatedITList.push( alpha * i0List[i] + (1-alpha) * i0List[i] * Math.pow(Math.E, - thicknessFactor * muList[i] ) );
+        }
 
-	newSource = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListP }
-	});
+        // Interpolate simulatedIT:
+        var interpolatedITList = [];
+        j = 0;
+        for (var i = 1; i < energyList.length; i++) {
+            iTInitial = simulatedITList[i-1];
+            iTFinal = simulatedITList[i];
+            energyInitial = energyList[i-1];
+            energyFinal = energyList[i];
+            
+            var interpolatingSlope = (iTFinal - iTInitial) / (energyFinal - energyInitial);
+            while (interpolatedEnergyList[j] <= energyFinal) {
+                interpolatedITList.push( iTInitial + interpolatingSlope * (interpolatedEnergyList[j] - energyInitial) );
+                j++;
+            }
+        }
 
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: newSource,
-		line_width: 2
-	});
+        // Interpolate i0:
+        var interpolatedI0List = [];
+        j = 0;
+        for (var i = 1; i < energyList.length; i++) {
+            i0Initial = i0List[i-1];
+            i0Final = i0List[i];
+            energyInitial = energyList[i-1];
+            energyFinal = energyList[i];
+            
+            var interpolatingSlope = (i0Final - i0Initial) / (energyFinal - energyInitial);
+            while (interpolatedEnergyList[j] <= energyFinal) {
+                interpolatedI0List.push( i0Initial + interpolatingSlope * (interpolatedEnergyList[j] - energyInitial) );
+                j++;
+            }
+        }
 
-	Bokeh.Plotting.show(plot);
+        // Create a list of Lorentzian values:
+        function lorentzian(x,x0) {
+            return fwhm / (2 * Math.PI * ((x - x0)*(x - x0) + fwhm*fwhm/4));
+        }
 
-});
-///////////////////////////////////////////
-// CODE FOR A CHANGE IN THICKNESSFACTOR: //
-///////////////////////////////////////////
-$("#thicknessFactorSlider").on('input', function(e) { 
-	$( ".bk-root" ).empty();
-
-	window.xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
-	window.ydr = new Bokeh.Range1d({ start: plot.y_range.start, end: plot.y_range.end });
-	window.plot = Bokeh.Plotting.figure({
-		title:'Mu',
-		x_range: xdr,
-		y_range: ydr,
-		tools: tools,
-		height: 400,
-		width: 600
-	});
-
-	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
-	muListP = [];
-	
-	for (var ii = 0; ii < energyList.length ; ii++) {		
-		var modifiedItransValue = alpha + (1-alpha) * Math.pow(Math.E, - thicknessFactor * muList[ii]);
-		muListP.push( - Math.log(modifiedItransValue));
-	}
+        // Convolve the iT and i0 data with the Lorentzian:
+        for (var i = 0; i < energyList.length; i++) {
+            var iTaccumulator = 0;
+            var i0accumulator = 0;
+            var lorCenter = energyList[i];
+            for (var j = 0; j < arrayLength; j++) {
+                lorValue = lorentzian(interpolatedEnergyList[j],lorCenter);
+                iTaccumulator += interpolatedITList[j] * lorValue;
+                i0accumulator += interpolatedI0List[j] * lorValue;
+            }
+            // calculate mu:
+            muListP.push( - Math.log(iTaccumulator/i0accumulator) );
+        }
 
 /////////////////////////////////////////////// NORMALIZE:
 	// first determine the index corresponding to the first energy value greater than 5500:
