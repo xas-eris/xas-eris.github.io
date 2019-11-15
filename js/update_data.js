@@ -2,6 +2,9 @@
 // CODE FOR A CHANGE IN FILE: //
 ////////////////////////////////
 $("#myFile").change(function(e){
+
+	lastScroll = getScroll(); //we will need this info at the very end...
+
 	$( ".bk-root" ).empty();
 
 	energyList = [];
@@ -96,7 +99,7 @@ $("#myFile").change(function(e){
 
 	Bokeh.Plotting.show(plot);
 
-	window.scrollTo(0,94);
+	window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started. 
 
 	});
 });
@@ -105,6 +108,8 @@ $("#myFile").change(function(e){
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
 $("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider,#lorCheck,#normCheck").on('input', function(e) { 
+
+	lastScroll = getScroll(); //we will need this info at the very end...
 
 	$( ".bk-root" ).empty();
 
@@ -243,6 +248,6 @@ if(document.getElementById('lorCheck').checked) {
 
 	Bokeh.Plotting.show(plot);
 
-	window.scrollTo(0,94);
+	window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started. 
 
 });
