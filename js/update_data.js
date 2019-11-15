@@ -8,11 +8,13 @@ $("#myFile").change(function(e){
 	i0List = [];
 	itransList = [];
 	muList = [];
+	muListN = [];
 	window.plot = Bokeh.Plotting.figure({
 		title:'Mu',
 		tools: tools,
-		height: 400,
-		width: 600
+		height: (2/3) * wrapperWidth,
+		width: wrapperWidth,
+		margin: ''
 	});
 
 	var myFile = this.files[0];
@@ -72,36 +74,18 @@ $("#myFile").change(function(e){
 		itransList
 		var muValue = - Math.log(itransValue/i0Value);
 		muList.push(muValue);
+		muListN.push(muValue);
 	}
 
-	muListP = muList;
+///////////////////////////////////////////////
 
-/////////////////////////////////////////////// NORMALIZE:
-	// first determine the index corresponding to the first energy value greater than 5500:
-        var index = -1;
-        energyList.some(function(el, i) {
-            if (el > 5500) {
-                index = i;
-                return true;
-            }
-        });
-        
-        var diff = muListP[index] - muListP[0];
-        for (var i = 0; i < energyList.length; i++) {
-            if (alpha != 1) {
-                muListP[i] /= diff;
-            }
-        }
+	normalize(energyList,muListN);
+	subtractOffset(energyList,muListN);
 
-	// subtract vertical offset:
-	var b = muListP[0];
-	for (var i = 0; i < energyList.length; i++) {
-	    muListP[i] -= b;
-	}
 ///////////////////////////////////////////////
 
 	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListP }
+	    data: { x: energyList, y: muListN }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {
@@ -112,17 +96,16 @@ $("#myFile").change(function(e){
 
 	Bokeh.Plotting.show(plot);
 
+	window.scrollTo(0,94);
+
 	});
 });
 
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider,#lorCheck").on('input', function(e) { 
-if(document.getElementById('lorCheck').checked) {
-//////////////////////////////////////////////////////////////////////
-//////////////////////// CONVOLUTION: ////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider,#lorCheck,#normCheck").on('input', function(e) { 
+
 	$( ".bk-root" ).empty();
 
 	window.xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
@@ -131,15 +114,21 @@ if(document.getElementById('lorCheck').checked) {
 		title:'Mu',
 		x_range: xdr,
 		y_range: ydr,
+
 		tools: tools,
-		height: 400,
-		width: 600
+		height: (2/3) * wrapperWidth,
+		width: wrapperWidth,
+		margin: ''
 	});
 
 	alpha = Number(document.getElementById("alphaSlider").value);	
 	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
 	fwhm = Number(document.getElementById("lorentzianSlider").value);	
+	
 	muListP = [];
+
+if(document.getElementById('lorCheck').checked) {
+//////////////////////////////////////////////////////////////////////  CONVOLUTION:
 
 	// Choose deltaE, the horizontal separation between points in the interpolated data, to be the smallest existing separation between points in the non-interpolated data:
         var deltaE = "";
@@ -162,7 +151,7 @@ if(document.getElementById('lorCheck').checked) {
         // Create a list of thicknessFactor-dependent, and alpha-dependent, simulated IT data:
         var simulatedITList = [];
         for (var i = 0; i < energyList.length; i++) {
-            simulatedITList.push( alpha * i0List[i] + (1-alpha) * i0List[i] * Math.pow(Math.E, - thicknessFactor * muList[i] ) );
+            simulatedITList.push( alpha * i0List[i] + (1-alpha) * i0List[i] * Math.pow(Math.E, - thicknessFactor * muList[i] ) );// should this use muList or muListN?
         }
 
         // Interpolate simulatedIT:
@@ -216,104 +205,25 @@ if(document.getElementById('lorCheck').checked) {
             muListP.push( - Math.log(iTaccumulator/i0accumulator) );
         }
 
-/////////////////////////////////////////////// NORMALIZE:
-	// first determine the index corresponding to the first energy value greater than 5500:
-        var index = -1;
-        energyList.some(function(el, i) {
-            if (el > 5500) {
-                index = i;
-                return true;
-            }
-        });
-        
-        var diff = muListP[index] - muListP[0];
-        for (var i = 0; i < energyList.length; i++) {
-            if (alpha != 1) {
-                muListP[i] /= diff;
-            }
-        }
-
-	// subtract vertical offset:
-	var b = muListP[0];
-	for (var i = 0; i < energyList.length; i++) {
-	    muListP[i] -= b;
-	}
-///////////////////////////////////////////////
-
-	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muList }
-	});
-
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: source,
-		line_color: "Red",
-		line_width: 2
-	});
-
-	newSource = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListP }
-	});
-
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: newSource,
-		line_width: 2
-	});
-
-	Bokeh.Plotting.show(plot);
-
 } else {
-//////////////////////////////////////////////////////////////////////
-////////////////////////   NO CONVOLUTION:  //////////////////////////
-//////////////////////////////////////////////////////////////////////
-	$( ".bk-root" ).empty();
-
-	window.xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
-	window.ydr = new Bokeh.Range1d({ start: plot.y_range.start, end: plot.y_range.end });
-	window.plot = Bokeh.Plotting.figure({
-		title:'Mu',
-		x_range: xdr,
-		y_range: ydr,
-		tools: tools,
-		height: 400,
-		width: 600
-	});
-
-	alpha = Number(document.getElementById("alphaSlider").value);	
-	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
-	fwhm = Number(document.getElementById("lorentzianSlider").value);	
-	
-	muListP = [];
+////////////////////////////////////////////////////   NO CONVOLUTION:
 	for (var i = 0; i < energyList.length ; i++) {
 		var muValue = - Math.log(alpha + (1-alpha) * Math.pow(Math.E, - thicknessFactor * muList[i] ));
 		muListP.push(muValue);
 	}
+}
+////////////////////////////////////////////////////
 
-/////////////////////////////////////////////// NORMALIZE:
-	// first determine the index corresponding to the first energy value greater than 5500:
-        var index = -1;
-        energyList.some(function(el, i) {
-            if (el > 5500) {
-                index = i;
-                return true;
-            }
-        });
-        
-        var diff = muListP[index] - muListP[0];
-        for (var i = 0; i < energyList.length; i++) {
-            if (alpha != 1) {
-                muListP[i] /= diff;
-            }
-        }
-
-	// subtract vertical offset:
-	var b = muListP[0];
-	for (var i = 0; i < energyList.length; i++) {
-	    muListP[i] -= b;
+	if(document.getElementById('normCheck').checked) {
+		normalize(energyList,muListP);
 	}
-///////////////////////////////////////////////
+
+	subtractOffset(energyList,muListP);
+
+////////////////////////////////////////////////////
 
 	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muList }
+	    data: { x: energyList, y: muListN }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {
@@ -332,5 +242,7 @@ if(document.getElementById('lorCheck').checked) {
 	});
 
 	Bokeh.Plotting.show(plot);
-}
+
+	window.scrollTo(0,94);
+
 });

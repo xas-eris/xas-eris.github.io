@@ -8,18 +8,45 @@ function showVal(newVal,id){
   document.getElementById(id).innerHTML=newVal;
 }
 
+function normalize(eList,myList) {
+	// first determine the index corresponding to the first energy value greater than 5500:
+	var index = -1;
+        eList.some(function(el, i) {
+            if (el > 5500) {
+                index = i;
+                return true;
+            }
+        });
+        
+        var diff = myList[index] - myList[0];
+        for (var i = 0; i < eList.length; i++) {
+            if (alpha != 1) {
+                myList[i] /= diff;
+            }
+        }
+}
+
+function subtractOffset(eList,myList) {
+	// subtract vertical offset:
+	var b = myList[0];
+	for (var i = 0; i < eList.length; i++) {
+	    myList[i] -= b;
+	}
+}
+
 $(document).ready(function(){
 
   window.energyList = [];
   window.i0List = [];
   window.itransList = [];
-  window.muList = [];
-  window.muListP = [];
+  window.muList = [];    // MuList does not get normalized and the vertical offset is not compensated for
+  window.muListN = [];   // MuListN gets normalized and vertical offset is compensated for. It's the red line.
+  window.muListP = [];   // MuListP gets manipulated however the program tells it to. It's the blue line.
   window.alpha = 0;
   window.thicknessFactor = 1;
-
   window.fwhm = 0.1;
 
+  window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
   window.tools = "pan,wheel_zoom,box_zoom,reset,save";
   window.xdr = new Bokeh.Range1d({ start: 5350, end: 5600 });
   window.ydr = new Bokeh.Range1d({ start: -1, end: 1.2 });
@@ -28,8 +55,9 @@ $(document).ready(function(){
 		x_range: xdr,
 		y_range: ydr,
 		tools: tools,
-		height: 400,
-		width: 600
+		height: (2/3) * wrapperWidth,
+		width: wrapperWidth,
+		margin: ''
 	});
 
   var request = new XMLHttpRequest();
@@ -94,37 +122,19 @@ $(document).ready(function(){
 		
 		var muValue = - Math.log(itransValue/i0Value);
 		muList.push(muValue);
+		muListN.push(muValue);
 	}
 
-	muListP = muList;
+///////////////////////////////////////////////
 
-/////////////////////////////////////////////// NORMALIZE:
-	// first determine the index corresponding to the first energy value greater than 5500:
-        var index = -1;
-        energyList.some(function(el, i) {
-            if (el > 5500) {
-                index = i;
-                return true;
-            }
-        });
-        
-        var diff = muListP[index] - muListP[0];
-        for (var i = 0; i < energyList.length; i++) {
-            if (alpha != 1) {
-                muListP[i] /= diff;
-            }
-        }
+	normalize(energyList,muListN)
+	subtractOffset(energyList,muListN)
 
-	// subtract vertical offset:
-	var b = muListP[0];
-	for (var i = 0; i < energyList.length; i++) {
-	    muListP[i] -= b;
-	}
 ///////////////////////////////////////////////
 	
 	// arrays to hold data
 	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListP }
+	    data: { x: energyList, y: muListN }
 	});
 	
 	// make the plot
