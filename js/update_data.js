@@ -107,7 +107,7 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider,#lorCheck,#normCheck").on('input', function(e) { 
+$("#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
 
 	lastScroll = getScroll(); //we will need this info at the very end...
 

@@ -8,6 +8,10 @@ function showVal(newVal,id){
   document.getElementById(id).innerHTML=newVal;
 }
 
+function updateTextInput(val,inputID) {
+          document.getElementById(inputID).value=val; 
+        }
+
 function normalize(eList,myList) {
 	// first determine the index corresponding to the first energy value greater than 5500:
 	var index = -1;
