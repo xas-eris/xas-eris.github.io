@@ -83,17 +83,31 @@ $("#myFile").change(function(e){
 ///////////////////////////////////////////////
 
 	normalize(energyList,muListN);
-	subtractOffset(energyList,muListN);
+	subtractOffset(energyList,muListN,0);
+	subtractOffset(energyList,muList,0);
 
 ///////////////////////////////////////////////
 
+
+	
+	// arrays to hold data
 	source = new Bokeh.ColumnDataSource({
 	    data: { x: energyList, y: muListN }
 	});
-
+	
+	// make the plot
 	plot.line({ field: "x" }, { field: "y" }, {
 		source: source,
 		line_color: "Red",
+		line_width: 2
+	});
+
+	newSource = new Bokeh.ColumnDataSource({
+	    data: { x: energyList, y: muList }
+	});
+
+	plot.line({ field: "x" }, { field: "y" }, {
+		source: newSource,
 		line_width: 2
 	});
 
@@ -107,7 +121,7 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
+$("#vertOffset,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
 
 	lastScroll = getScroll(); //we will need this info at the very end...
 
@@ -126,11 +140,15 @@ $("#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorent
 		margin: ''
 	});
 
+	vertOffset = Number(document.getElementById("vertOffset").value);	
 	alpha = Number(document.getElementById("alphaSlider").value);	
 	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
 	fwhm = Number(document.getElementById("lorentzianSlider").value);	
 	
 	muListP = [];
+
+	subtractOffset(energyList,muListN,vertOffset);
+	subtractOffset(energyList,muList,vertOffset); //this adjusts the muList values from the beginning so that the vertically-adjusted values are those used to calculate simulatedIT
 
 if(document.getElementById('lorCheck').checked) {
 //////////////////////////////////////////////////////////////////////  CONVOLUTION:
@@ -223,7 +241,7 @@ if(document.getElementById('lorCheck').checked) {
 		normalize(energyList,muListP);
 	}
 
-	subtractOffset(energyList,muListP);
+	subtractOffset(energyList,muListP,vertOffset);
 
 ////////////////////////////////////////////////////
 

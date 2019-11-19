@@ -13,7 +13,7 @@ function updateTextInput(val,inputID) {
         }
 
 function normalize(eList,myList) {
-	// first determine the index corresponding to the first energy value greater than 5500:
+	// first determine the index corresponding to the first energy value greater than 5500 eV:
 	var index = -1;
         eList.some(function(el, i) {
             if (el > 5500) {
@@ -30,9 +30,18 @@ function normalize(eList,myList) {
         }
 }
 
-function subtractOffset(eList,myList) {
+function subtractOffset(eList,myList,offset) {
+	// first determine the index corresponding to the first energy value greater than 5465 eV:
+	var index = -1;
+        eList.some(function(el, i) {
+            if (el > 5465) {
+                index = i;
+                return true;
+            }
+        });
+
 	// subtract vertical offset:
-	var b = myList[0];
+	var b = myList[index] - offset;
 	for (var i = 0; i < eList.length; i++) {
 	    myList[i] -= b;
 	}
@@ -144,8 +153,9 @@ $(document).ready(function(){
 
 ///////////////////////////////////////////////
 
-	normalize(energyList,muListN)
-	subtractOffset(energyList,muListN)
+	normalize(energyList,muListN);
+	subtractOffset(energyList,muListN,0);
+	subtractOffset(energyList,muList,0);
 
 ///////////////////////////////////////////////
 	
@@ -158,6 +168,15 @@ $(document).ready(function(){
 	plot.line({ field: "x" }, { field: "y" }, {
 		source: source,
 		line_color: "Red",
+		line_width: 2
+	});
+
+	newSource = new Bokeh.ColumnDataSource({
+	    data: { x: energyList, y: muList }
+	});
+
+	plot.line({ field: "x" }, { field: "y" }, {
+		source: newSource,
 		line_width: 2
 	});
 
