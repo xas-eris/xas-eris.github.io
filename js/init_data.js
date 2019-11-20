@@ -30,11 +30,11 @@ function normalize(eList,myList) {
         }
 }
 
-function subtractOffset(eList,myList,offset) {
-	// first determine the index corresponding to the first energy value greater than 5465 eV:
+function subtractOffset(eList,myList,prEdge,offset) {
+	// first determine the index corresponding to the first energy value greater than location of prEdge:
 	var index = -1;
         eList.some(function(el, i) {
-            if (el > 5465) {
+            if (el > prEdge) {
                 index = i;
                 return true;
             }
@@ -68,6 +68,8 @@ $(document).ready(function(){
   window.muList = [];    // MuList does not get normalized and the vertical offset is not compensated for
   window.muListN = [];   // MuListN gets normalized and vertical offset is compensated for. It's the red line.
   window.muListP = [];   // MuListP gets manipulated however the program tells it to. It's the blue line.
+  window.preEdge = 5465;
+  window.vertOffset = 0;
   window.alpha = 0;
   window.thicknessFactor = 1;
   window.fwhm = 0.1;
@@ -154,11 +156,11 @@ $(document).ready(function(){
 ///////////////////////////////////////////////
 
 	normalize(energyList,muListN);
-	subtractOffset(energyList,muListN,0);
-	subtractOffset(energyList,muList,0);
+	subtractOffset(energyList,muListN,preEdge,vertOffset);
+	subtractOffset(energyList,muList,preEdge,vertOffset);
 
 ///////////////////////////////////////////////
-	
+
 	// arrays to hold data
 	source = new Bokeh.ColumnDataSource({
 	    data: { x: energyList, y: muListN }

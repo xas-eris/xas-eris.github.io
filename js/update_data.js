@@ -12,6 +12,8 @@ $("#myFile").change(function(e){
 	itransList = [];
 	muList = [];
 	muListN = [];
+	preEdge = 5465;
+	vertOffset = 0;
 	window.plot = Bokeh.Plotting.figure({
 		title:'Mu',
 		tools: tools,
@@ -83,8 +85,8 @@ $("#myFile").change(function(e){
 ///////////////////////////////////////////////
 
 	normalize(energyList,muListN);
-	subtractOffset(energyList,muListN,0);
-	subtractOffset(energyList,muList,0);
+	subtractOffset(energyList,muListN,preEdge,vertOffset);
+	subtractOffset(energyList,muList,preEdge,vertOffset);
 
 ///////////////////////////////////////////////
 
@@ -121,7 +123,7 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#vertOffset,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
+$("#preEdgeInput,#vertOffsetInput,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
 
 	lastScroll = getScroll(); //we will need this info at the very end...
 
@@ -140,15 +142,16 @@ $("#vertOffset,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorI
 		margin: ''
 	});
 
-	vertOffset = Number(document.getElementById("vertOffset").value);	
+	preEdge = Number(document.getElementById("preEdgeInput").value);
+	vertOffset = Number(document.getElementById("vertOffsetInput").value);
 	alpha = Number(document.getElementById("alphaSlider").value);	
 	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
 	fwhm = Number(document.getElementById("lorentzianSlider").value);	
 	
 	muListP = [];
 
-	subtractOffset(energyList,muListN,vertOffset);
-	subtractOffset(energyList,muList,vertOffset); //this adjusts the muList values from the beginning so that the vertically-adjusted values are those used to calculate simulatedIT
+	subtractOffset(energyList,muListN,preEdge,vertOffset);
+	subtractOffset(energyList,muList,preEdge,vertOffset); //this adjusts the muList values from the beginning so that the vertically-adjusted values are those used to calculate simulatedIT
 
 if(document.getElementById('lorCheck').checked) {
 //////////////////////////////////////////////////////////////////////  CONVOLUTION:
@@ -240,9 +243,7 @@ if(document.getElementById('lorCheck').checked) {
 	if(document.getElementById('normCheck').checked) {
 		normalize(energyList,muListP);
 	}
-
-	subtractOffset(energyList,muListP,vertOffset);
-
+	subtractOffset(energyList,muListP,preEdge,vertOffset);
 ////////////////////////////////////////////////////
 
 	source = new Bokeh.ColumnDataSource({
