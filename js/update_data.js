@@ -125,12 +125,13 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 $("#preEdgeInput,#vertOffsetInput,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
 
-	// the following is for aesthetics; it makes there always be 3 visible digits when sliders are manipulated:
+/*	// the following is for aesthetics; it makes there always be 3 visible digits when sliders are manipulated:
 	$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider").on('input',function (e) {
 		$("#alphaInput").val(parseFloat($("#alphaSlider").val()).toFixed(2));
 		$("#thicknessFactorInput").val(parseFloat($("#thicknessFactorSlider").val()).toFixed(2));
 		$("#lorentzianInput").val(parseFloat($("#lorentzianSlider").val()).toFixed(2));
 	});
+*/
 
 	lastScroll = getScroll(); //we will need this info at the very end...
 

@@ -40,7 +40,7 @@ function subtractOffset(eList,myList,prEdge,offset) {
             }
         });
 
-	if (index == -1 ) {index = 0; return true;} // if there is no index corresponding to that energy value, then use the first energy value in the list
+	if (index == -1 ) {index = 0} // if there is no index corresponding to that energy value, then use the first energy value in the list
 
 	// subtract vertical offset:
 	var b = myList[index] - offset;
