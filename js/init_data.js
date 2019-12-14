@@ -10,37 +10,48 @@ function showVal(newVal,id){
 
 function updateTextInput(val,inputID) {
           document.getElementById(inputID).value=val; 
-        }
+}
 
-function normalize(eList,myList) {
-	// first determine the index corresponding to the first energy value greater than 5500 eV:
+function getBeta(lam2,lam1,t) {
+	if (lam2 < lam1) {
+		return ( (1/lam2) - (1/lam1) )*t;
+	} else {
+		window.log("error: attenuation length @ lower energy must exceed attenuation length @ higher energy");
+		return NaN;
+	}
+}
+
+function getEnergyIndex(eList,eVal) {
+	// determine the index corresponding to the first energy value greater than eVal:
 	var index = -1;
         eList.some(function(el, i) {
-            if (el > 5500) {
+            if (el > eVal && i !== 0) {
                 index = i;
                 return true;
             }
         });
+
+	if (index == -1 ) {index = NaN; window.log('error: energy value out-of-range');}
+
+	return index;
+}
+
+function normalize(eList,myList,lowE,highE,preEdgeE,t,lam1) {
+	var index1 = getEnergyIndex(eList,lowE);
+	var index2 = getEnergyIndex(eList,highE);
+	var index3 = getEnergyIndex(eList,preEdgeE);
         
-        var diff = myList[index] - myList[0];
+        var diff = myList[index2] - myList[index1];
+	var subtractOff = myList[index3]/diff - t/lam1 ; //after scaling, vertically offsets the scaled data such that myList(preEdgeE) = 1 / lambda(preEdgeE)
         for (var i = 0; i < eList.length; i++) {
             if (alpha != 1) {
-                myList[i] /= diff;
+                myList[i] = myList[i] / diff - subtractOff;
             }
         }
 }
 
 function subtractOffset(eList,myList,prEdge,offset) {
-	// first determine the index corresponding to the first energy value greater than location of prEdge:
-	var index = -1;
-        eList.some(function(el, i) {
-            if (el > prEdge) {
-                index = i;
-                return true;
-            }
-        });
-
-	if (index == -1 ) {index = 0} // if there is no index corresponding to that energy value, then use the first energy value in the list
+	index = getEnergyIndex(eList,prEdge);
 
 	// subtract vertical offset:
 	var b = myList[index] - offset;
@@ -62,28 +73,38 @@ window.getScroll = function() {
     }
 }
 
+$(":file").filestyle({
+  icon: false
+});
+
 $(document).ready(function(){
 
-  window.energyList = [];
-  window.i0List = [];
-  window.itransList = [];
-  window.muList = [];    // MuList does not get normalized and the vertical offset is not compensated for
-  window.muListN = [];   // MuListN gets normalized and vertical offset is compensated for. It's the red line.
-  window.muListP = [];   // MuListP gets manipulated however the program tells it to. It's the blue line.
-  window.preEdge = 5465;
-  window.vertOffset = 0;
+  window.energy = [];
+  window.i0 = [];
+  window.iT = [];
+  window.mu_t = [];
+  window.mu_t_input = [];
+  window.mu_t_output = [];
+  window.energy1 = 5450;
+  window.energy2 = 5500;
+  window.lambda1 = 28.7;
+  window.lambda2 = 4.67;
+  window.thickness = 1;
   window.alpha = 0;
-  window.thicknessFactor = 1;
   window.fwhm = 0.1;
+  window.normE1 = 0;
+  window.normE2 = 0;
 
   window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
   window.tools = "pan,wheel_zoom,box_zoom,reset,save";
   window.xdr = new Bokeh.Range1d({ start: 5350, end: 5600 });
-  window.ydr = new Bokeh.Range1d({ start: -1, end: 1.2 });
+  window.ydr = new Bokeh.Range1d({ start: 0, end: 0.3 });
   window.plot = Bokeh.Plotting.figure({
-		title:'Mu',
+		title: "",
 		x_range: xdr,
 		y_range: ydr,
+		x_axis_label: "Energy (eV)",
+		y_axis_label: "\u03BC\u0074 (dimensionless)",
 		tools: tools,
 		height: (2/3) * wrapperWidth,
 		width: wrapperWidth,
@@ -144,39 +165,34 @@ $(document).ready(function(){
 		aLineList = aLineList.filter(Boolean);
 
 		var energyValue = Number(aLineList[energyIndex]);
-		energyList.push(energyValue);
+		energy.push(energyValue);
 		var i0Value = Number(aLineList[i0Index]);
-		i0List.push(i0Value);
+		i0.push(i0Value);
 		var itransValue = Number(aLineList[itransIndex]);
-		itransList.push(itransValue);
+		iT.push(itransValue);
 		
-		var muValue = - Math.log(itransValue/i0Value);
-		muList.push(muValue);
-		muListN.push(muValue);
+		var muValue = Math.log(i0Value/itransValue);
+		mu_t.push(muValue);
 	}
 
 ///////////////////////////////////////////////
 
-	normalize(energyList,muListN);
-	subtractOffset(energyList,muListN,preEdge,vertOffset);
-	subtractOffset(energyList,muList,preEdge,vertOffset);
+	var energyIndex1 = getEnergyIndex(energy,energy1);
+	var mu_t_E1 = mu_t[energyIndex1];
+	var energyIndex2 = getEnergyIndex(energy,energy2);
+	var mu_t_E2 = mu_t[energyIndex2];
+
+	var beta = getBeta(lambda2,lambda1,thickness);
+	var scaleBy = beta / ( mu_t_E2 - mu_t_E1 );
+
+	for (var i = 0; i < energy.length ; i++) {
+		mu_t_input.push(scaleBy * ( mu_t[i] - mu_t_E1 ) + (thickness / lambda1) ); // First, vertically offsets mu_t such that it is 0 at E1; then, scales to satisfy the Beta requirement; finally, vertically offsets such that mu_t_input(E1) = 1 / lambda(E1)
+	}
 
 ///////////////////////////////////////////////
 
-	// arrays to hold data
-	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListN }
-	});
-	
-	// make the plot
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: source,
-		line_color: "Red",
-		line_width: 2
-	});
-
 	newSource = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muList }
+	    data: { x: energy, y: mu_t_input }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {

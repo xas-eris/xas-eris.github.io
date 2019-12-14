@@ -7,20 +7,29 @@ $("#myFile").change(function(e){
 
 	$( ".bk-root" ).empty();
 
-	energyList = [];
-	i0List = [];
-	itransList = [];
-	muList = [];
-	muListN = [];
-	preEdge = 5465;
-	vertOffset = 0;
-	window.plot = Bokeh.Plotting.figure({
-		title:'Mu',
-		tools: tools,
-		height: (2/3) * wrapperWidth,
-		width: wrapperWidth,
-		margin: ''
-	});
+	energy = [];
+	i0 = [];
+	iT = [];
+	mu_t = [];
+	mu_t_input = [];
+	mu_t_output = [];
+	energy1 = parseFloat( prompt("Please enter E1 (smaller than E2) for lambda(E1);") );
+	$("#e1").val(energy1);
+	lambda1 = parseFloat( prompt("Please enter lambda(E1)") );
+	$("#lam1").val(lambda1);
+	energy2 = parseFloat( prompt("Please enter E2 for lambda(E2)") );
+	$("#e2").val(energy2);
+	lambda2 = parseFloat( prompt("Please enter lambda(E2)") );
+	$("#lam2").val(lambda2);
+
+	thickness = parseFloat( prompt("Please enter your sample thickness") );;
+	$("#thicknessFactorSlider,#thicknessFactorInput").val(thickness);
+	alpha = 0;
+	$("#alphaSlider,#alphaInput").val(alpha);
+	fwhm = 0.1;
+	$("#lorentzianSlider,#lorentzianInput").val(fwhm);
+	normE1 = 0;
+	normE2 = 0;
 
 	var myFile = this.files[0];
 	readFile(myFile, function(e) {
@@ -71,41 +80,51 @@ $("#myFile").change(function(e){
 		aLineList = aLineList.filter(Boolean);
 
 		var energyValue = Number(aLineList[energyIndex]);
-		energyList.push(energyValue);
+		energy.push(energyValue);
 		var i0Value = Number(aLineList[i0Index]);
-		i0List.push(i0Value);
+		i0.push(i0Value);
 		var itransValue = Number(aLineList[itransIndex]);
-		itransList.push(itransValue);
-		itransList
-		var muValue = - Math.log(itransValue/i0Value);
-		muList.push(muValue);
-		muListN.push(muValue);
+		iT.push(itransValue);
+
+		var muValue = Math.log(i0Value/itransValue);
+		mu_t.push(muValue);
 	}
 
 ///////////////////////////////////////////////
 
-	normalize(energyList,muListN);
-	subtractOffset(energyList,muListN,preEdge,vertOffset);
-	subtractOffset(energyList,muList,preEdge,vertOffset);
+	var energyIndex1 = getEnergyIndex(energy,energy1);
+	var mu_t_E1 = mu_t[energyIndex1];
+	var energyIndex2 = getEnergyIndex(energy,energy2);
+	var mu_t_E2 = mu_t[energyIndex2];
+
+	var beta = getBeta(lambda2,lambda1,thickness);
+	var scaleBy = beta / ( mu_t_E2 - mu_t_E1 );
+
+	for (var i = 0; i < energy.length ; i++) {
+		mu_t_input.push(scaleBy * ( mu_t[i] - mu_t_E1 ) + (thickness / lambda1) ); // First, vertically offsets mu_t such that it is 0 at E1; then, scales to satisfy the Beta requirement; finally, vertically offsets such that mu_t_input(E1) = 1 / lambda(E1)
+	}
 
 ///////////////////////////////////////////////
 
+	window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
+	window.tools = "pan,wheel_zoom,box_zoom,reset,save";
+	window.xdr = new Bokeh.Range1d({ start: energy[0], end: energy[energy.length-1] });
+	window.ydr = new Bokeh.Range1d({ start: Math.min.apply(null, mu_t_input), end: Math.max.apply(null, mu_t_input) });
+	window.plot = Bokeh.Plotting.figure({
+		title: "",
+		x_range: xdr,
+		y_range: ydr,
+		x_axis_label: "Energy (eV)",
+		y_axis_label: "\u03BC\u0074 (dimensionless)",
+		tools: tools,
+		height: (2/3) * wrapperWidth,
+		width: wrapperWidth,
+		margin: ''
+	});
 
-	
-	// arrays to hold data
-	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListN }
-	});
-	
-	// make the plot
-	plot.line({ field: "x" }, { field: "y" }, {
-		source: source,
-		line_color: "Red",
-		line_width: 2
-	});
 
 	newSource = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muList }
+	    data: { x: energy, y: mu_t_input }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {
@@ -123,79 +142,85 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#preEdgeInput,#vertOffsetInput,#alphaSlider,#alphaInput,#thicknessFactorSlider,#thicknessFactorInput,#lorentzianSlider,#lorentzianInput,#lorCheck,#normCheck").on('input', function(e) { 
-
-/*	// the following is for aesthetics; it makes there always be 3 visible digits when sliders are manipulated:
-	$("#alphaSlider,#thicknessFactorSlider,#lorentzianSlider").on('input',function (e) {
-		$("#alphaInput").val(parseFloat($("#alphaSlider").val()).toFixed(2));
-		$("#thicknessFactorInput").val(parseFloat($("#thicknessFactorSlider").val()).toFixed(2));
-		$("#lorentzianInput").val(parseFloat($("#lorentzianSlider").val()).toFixed(2));
-	});
-*/
+$("#e1,#lam1,#e2,#lam2,#thicknessFactorSlider,#thicknessFactorInput,#alphaSlider,#alphaInput,#lorCheck,#lorentzianSlider,#lorentzianInput,#normCheck,#normEnergyInput1,#normEnergyInput2,#preEdgeInput").on('input', function(e) { 
 
 	lastScroll = getScroll(); //we will need this info at the very end...
 
 	$( ".bk-root" ).empty();
 
-	window.xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
-	window.ydr = new Bokeh.Range1d({ start: plot.y_range.start, end: plot.y_range.end });
+	window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
+	xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
+	ydr = new Bokeh.Range1d({ start: plot.y_range.start, end: plot.y_range.end });
 	window.plot = Bokeh.Plotting.figure({
-		title:'Mu',
+		title: "",
 		x_range: xdr,
 		y_range: ydr,
-
+		x_axis_label: "Energy (eV)",
+		y_axis_label: "\u03BC\u0074 (dimensionless)",
 		tools: tools,
 		height: (2/3) * wrapperWidth,
 		width: wrapperWidth,
 		margin: ''
 	});
 
-	preEdge = Number(document.getElementById("preEdgeInput").value);
-	vertOffset = Number(document.getElementById("vertOffsetInput").value);
-	alpha = Number(document.getElementById("alphaSlider").value);	
-	thicknessFactor = Number(document.getElementById("thicknessFactorSlider").value);
-	fwhm = Number(document.getElementById("lorentzianSlider").value);	
-	
-	muListP = [];
+	energy1 = Number(document.getElementById("e1").value);
+	energy2 = Number(document.getElementById("e2").value);
+	lambda1 = Number(document.getElementById("lam1").value);
+	lambda2 = Number(document.getElementById("lam2").value);
+	thickness = Number(document.getElementById("thicknessFactorInput").value);
+	alpha = Number(document.getElementById("alphaInput").value) / 100;	
+	fwhm = Number(document.getElementById("lorentzianInput").value);	
+	normE1 = Number(document.getElementById("normEnergyInput1").value);
+	normE2 = Number(document.getElementById("normEnergyInput2").value);
 
-	subtractOffset(energyList,muListN,preEdge,vertOffset);
-	subtractOffset(energyList,muList,preEdge,vertOffset); //this adjusts the muList values from the beginning so that the vertically-adjusted values are those used to calculate simulatedIT
+	var energyIndex1 = getEnergyIndex(energy,energy1);
+	var mu_t_E1 = mu_t[energyIndex1];
+	var energyIndex2 = getEnergyIndex(energy,energy2);
+	var mu_t_E2 = mu_t[energyIndex2];
+
+	var beta = getBeta(lambda2,lambda1,thickness);
+	var scaleBy = beta / ( mu_t_E2 - mu_t_E1 );
+
+	mu_t_input = [];
+	for (var i = 0; i < energy.length ; i++) {
+		mu_t_input.push(scaleBy * ( mu_t[i] - mu_t_E1 ) + (thickness / lambda1) ); // First, vertically offsets mu_t such that it is 0 at E1; then, scales to satisfy the Beta requirement; finally, vertically offsets such that mu_t_input(E1) = 1 / lambda(E1)
+	}
 
 if(document.getElementById('lorCheck').checked) {
 //////////////////////////////////////////////////////////////////////  CONVOLUTION:
 
 	// Choose deltaE, the horizontal separation between points in the interpolated data, to be the smallest existing separation between points in the non-interpolated data:
         var deltaE = "";
-        for (var i = 1; i < energyList.length; i++) {
-            if (Math.abs(energyList[i] - energyList[i-1]) < deltaE || deltaE === ""){
-                deltaE = energyList[i] - energyList[i-1];
+        for (var i = 1; i < energy.length; i++) {
+            if (Math.abs(energy[i] - energy[i-1]) < deltaE || deltaE === ""){
+                deltaE = energy[i] - energy[i-1];
             }
         }
 
         // The number of points in the interpolated data:
-        arrayLength = Math.floor( (energyList[energyList.length - 1] - energyList[0]) / deltaE );
+        arrayLength = Math.floor( (energy[energy.length - 1] - energy[0]) / deltaE );
 
         // Create a list of the interpolated energy values:
         var interpolatedEnergyList = [];
-        var firstEnergyValue = Math.ceil(energyList[0]);
+        var firstEnergyValue = Math.ceil(energy[0]);
         for (var i = 0; i < arrayLength; i++) {
             interpolatedEnergyList.push(firstEnergyValue + i * deltaE);
         }
 
         // Create a list of thicknessFactor-dependent, and alpha-dependent, simulated IT data:
         var simulatedITList = [];
-        for (var i = 0; i < energyList.length; i++) {
-            simulatedITList.push( alpha * i0List[i] + (1-alpha) * i0List[i] * Math.pow(Math.E, - thicknessFactor * muList[i] ) );// should this use muList or muListN?
+        for (var i = 0; i < energy.length; i++) {
+            simulatedITList.push( alpha * i0[i] + (1-alpha) * i0[i] * Math.pow(Math.E, - mu_t_input[i] ) );
         }
 
         // Interpolate simulatedIT:
         var interpolatedITList = [];
         j = 0;
-        for (var i = 1; i < energyList.length; i++) {
+        for (var i = 1; i < energy.length; i++) {
             iTInitial = simulatedITList[i-1];
             iTFinal = simulatedITList[i];
-            energyInitial = energyList[i-1];
-            energyFinal = energyList[i];
+            energyInitial = energy[i-1];
+            energyFinal = energy[i];
             
             var interpolatingSlope = (iTFinal - iTInitial) / (energyFinal - energyInitial);
             while (interpolatedEnergyList[j] <= energyFinal) {
@@ -207,11 +232,11 @@ if(document.getElementById('lorCheck').checked) {
         // Interpolate i0:
         var interpolatedI0List = [];
         j = 0;
-        for (var i = 1; i < energyList.length; i++) {
-            i0Initial = i0List[i-1];
-            i0Final = i0List[i];
-            energyInitial = energyList[i-1];
-            energyFinal = energyList[i];
+        for (var i = 1; i < energy.length; i++) {
+            i0Initial = i0[i-1];
+            i0Final = i0[i];
+            energyInitial = energy[i-1];
+            energyFinal = energy[i];
             
             var interpolatingSlope = (i0Final - i0Initial) / (energyFinal - energyInitial);
             while (interpolatedEnergyList[j] <= energyFinal) {
@@ -226,36 +251,38 @@ if(document.getElementById('lorCheck').checked) {
         }
 
         // Convolve the iT and i0 data with the Lorentzian:
-        for (var i = 0; i < energyList.length; i++) {
+	mu_t_output = [];
+        for (var i = 0; i < energy.length; i++) {
             var iTaccumulator = 0;
             var i0accumulator = 0;
-            var lorCenter = energyList[i];
+            var lorCenter = energy[i];
             for (var j = 0; j < arrayLength; j++) {
                 lorValue = lorentzian(interpolatedEnergyList[j],lorCenter);
                 iTaccumulator += interpolatedITList[j] * lorValue;
                 i0accumulator += interpolatedI0List[j] * lorValue;
             }
-            // calculate mu:
-            muListP.push( - Math.log(iTaccumulator/i0accumulator) );
+            // calculate mu_t:
+            mu_t_output.push( Math.log( i0accumulator / iTaccumulator ) );
         }
 
 } else {
 ////////////////////////////////////////////////////   NO CONVOLUTION:
-	for (var i = 0; i < energyList.length ; i++) {
-		var muValue = - Math.log(alpha + (1-alpha) * Math.pow(Math.E, - thicknessFactor * muList[i] ));
-		muListP.push(muValue);
+	mu_t_output = [];
+	for (var i = 0; i < energy.length ; i++) {
+		var muValue = - Math.log(alpha + (1-alpha) * Math.pow(Math.E, - mu_t_input[i] ));
+		mu_t_output.push(muValue);
 	}
 }
 ////////////////////////////////////////////////////
 
 	if(document.getElementById('normCheck').checked) {
-		normalize(energyList,muListP);
+		normalize(energy,mu_t_input,normE1,normE2,energy1,thickness,lambda1);
+		normalize(energy,mu_t_output,normE1,normE2,energy1,thickness,lambda1);
 	}
-	subtractOffset(energyList,muListP,preEdge,vertOffset);
 ////////////////////////////////////////////////////
 
 	source = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListN }
+	    data: { x: energy, y: mu_t_input }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {
@@ -265,7 +292,7 @@ if(document.getElementById('lorCheck').checked) {
 	});
 
 	newSource = new Bokeh.ColumnDataSource({
-	    data: { x: energyList, y: muListP }
+	    data: { x: energy, y: mu_t_output }
 	});
 
 	plot.line({ field: "x" }, { field: "y" }, {
