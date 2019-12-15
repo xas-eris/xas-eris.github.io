@@ -13,13 +13,13 @@ $("#myFile").change(function(e){
 	mu_t = [];
 	mu_t_input = [];
 	mu_t_output = [];
-	energy1 = parseFloat( prompt("Please enter E1 (smaller than E2) for lambda(E1);") );
+	energy1 = parseFloat( prompt("Please enter a low E for \u03BB(E);") );
 	$("#e1").val(energy1);
-	lambda1 = parseFloat( prompt("Please enter lambda(E1)") );
+	lambda1 = parseFloat( prompt("Please enter \u03BB(E_low)") );
 	$("#lam1").val(lambda1);
-	energy2 = parseFloat( prompt("Please enter E2 for lambda(E2)") );
+	energy2 = parseFloat( prompt("Please enter a high E for \u03BB(E)") );
 	$("#e2").val(energy2);
-	lambda2 = parseFloat( prompt("Please enter lambda(E2)") );
+	lambda2 = parseFloat( prompt("Please enter \u03BB(E_high)") );
 	$("#lam2").val(lambda2);
 
 	thickness = parseFloat( prompt("Please enter your sample thickness") );;
