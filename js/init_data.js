@@ -200,11 +200,9 @@ $(document).ready(function(){
 		line_width: 2
 	});
 
-	// Show the plot, appending it to the end of the current
-	// section of the document we are in.
+	// Show the plot, appending it to the plotID div
 
-	Bokeh.Plotting.show(plot);
-
+	Bokeh.Plotting.show(plot,document.getElementById("plotID"));
 	});
   };
   request.send();

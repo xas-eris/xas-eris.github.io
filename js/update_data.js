@@ -106,11 +106,11 @@ $("#myFile").change(function(e){
 
 ///////////////////////////////////////////////
 
-	window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
-	window.tools = "pan,wheel_zoom,box_zoom,reset,save";
-	window.xdr = new Bokeh.Range1d({ start: energy[0], end: energy[energy.length-1] });
-	window.ydr = new Bokeh.Range1d({ start: Math.min.apply(null, mu_t_input), end: Math.max.apply(null, mu_t_input) });
-	window.plot = Bokeh.Plotting.figure({
+	wrapperWidth = document.getElementById('wrapperID').offsetWidth;
+	tools = "pan,wheel_zoom,box_zoom,reset,save";
+	xdr = new Bokeh.Range1d({ start: energy[0], end: energy[energy.length-1] });
+	ydr = new Bokeh.Range1d({ start: Math.min.apply(null, mu_t_input), end: Math.max.apply(null, mu_t_input) });
+	plot = Bokeh.Plotting.figure({
 		title: "",
 		x_range: xdr,
 		y_range: ydr,
@@ -132,7 +132,7 @@ $("#myFile").change(function(e){
 		line_width: 2
 	});
 
-	Bokeh.Plotting.show(plot);
+	Bokeh.Plotting.show(plot,document.getElementById("plotID"));
 
 	window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started. 
 
@@ -148,10 +148,10 @@ $("#e1,#lam1,#e2,#lam2,#thicknessFactorSlider,#thicknessFactorInput,#alphaSlider
 
 	$( ".bk-root" ).empty();
 
-	window.wrapperWidth = document.getElementById('wrapperID').offsetWidth;
+	wrapperWidth = document.getElementById('wrapperID').offsetWidth;
 	xdr = new Bokeh.Range1d({ start: plot.x_range.start, end: plot.x_range.end });
 	ydr = new Bokeh.Range1d({ start: plot.y_range.start, end: plot.y_range.end });
-	window.plot = Bokeh.Plotting.figure({
+	plot = Bokeh.Plotting.figure({
 		title: "",
 		x_range: xdr,
 		y_range: ydr,
@@ -287,7 +287,6 @@ if(document.getElementById('lorCheck').checked) {
 
 	plot.line({ field: "x" }, { field: "y" }, {
 		source: source,
-		line_color: "Red",
 		line_width: 2
 	});
 
@@ -297,10 +296,11 @@ if(document.getElementById('lorCheck').checked) {
 
 	plot.line({ field: "x" }, { field: "y" }, {
 		source: newSource,
+		line_color: "Red",
 		line_width: 2
 	});
 
-	Bokeh.Plotting.show(plot);
+	Bokeh.Plotting.show(plot,document.getElementById("plotID"));
 
 	window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started. 
 

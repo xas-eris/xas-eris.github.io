@@ -78,31 +78,25 @@ input[type=number] {
 
 .centering_container {
   text-align: center;
-  position: relative
+  margin: auto;
+  position: relative;
+  padding: 0 20px;
 }
 
 .wrapper {
   background-color: #95917a;
-  margin: 0 auto 20px auto;
   padding: 20px;
   text-align: left;
-  width: 50%;
-  display:inline-block;
+  width: 45%;
+  float: left;
   border-radius: 5px;
 }
 
-.wrapper2 {
-  padding: 0 20px;
-  width: 125px;
-  text-align: left;
-  color: white;
-  vertical-align: top;
-  position: absolute;
-  display:inline-block;
-  bottom: 20px;
+#wrapperID {
 }
 
-#wrapperID {
+#plotID {
+	float: right;
 }
 
 .bk-slider-value {
