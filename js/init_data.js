@@ -199,10 +199,9 @@ $(document).ready(function(){
 		source: newSource,
 		line_width: 2
 	});
-
 	// Show the plot, appending it to the plotID div
-
 	Bokeh.Plotting.show(plot,document.getElementById("plotID"));
+//	document.getElementById('plotID').style.marginTop = (wrapperWidth / 6).toString().concat("px"); // this code will vertically shift the plot down
 	});
   };
   request.send();
