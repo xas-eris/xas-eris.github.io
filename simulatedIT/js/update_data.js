@@ -275,7 +275,7 @@ if(document.getElementById('lorCheck').checked) {
 		var muValue = - Math.log(alpha + (1-alpha) * Math.pow(Math.E, - mu_t_input[i] ));
 		mu_t_output.push(muValue);
 
-		simulatedITListP.push( i0[i] * Math.pow(Math.E, - mu_t_input[i] ) );
+		simulatedITListP.push(alpha * i0[i] + (1-alpha) * i0[i] * Math.pow(Math.E, - mu_t_input[i] ) );
 	}
 }
 ////////////////////////////////////////////////////
