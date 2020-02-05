@@ -9,7 +9,11 @@ function showVal(newVal,id){
 }
 
 function updateTextInput(val,inputID) {
-          document.getElementById(inputID).value=val; 
+        document.getElementById(inputID).value=val; 
+}
+
+function lorentzian(x,x0) {
+	return fwhm / (2 * Math.PI * ((x - x0)*(x - x0) + fwhm*fwhm/4));
 }
 
 function getBeta(lam2,lam1,t) {
