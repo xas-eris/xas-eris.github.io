@@ -29,11 +29,19 @@
 
 <div class="centering_container">
 
+  <div class="wrapper" style="float:none; color:white;">
+	<p>Welcome to Eris - a diagnostic and educational tool for simulating the effects of systematic errors in x-ray absorption spectroscopy (XAS) experiments. XAS is a measurement used to understand the molecular structure of materials. It works like this: a beam of x-rays is aimed at a sample material of thickness \( t \); some x-rays penetrate the sample while others are absorbed into it. The laws of quantum mechanics predict that the number of penetrating x-rays divided by the number of x-rays in the original beam (denoted \( I_T/I_0 \)) depends sensitively on both the energy of the incident x-ray beam and the sample's molecular structure. By measuring \( I_T \) and \( I_0 \) at many different beam energies for a particular sample, detailed information about the sample's molecular structure can be obtained and encoded in a plot of \( -log(I_T/I_0) \) versus beam energy. In terms of the <i>absorption coefficient</i>,</p>
+	<p style="text-align:center">\( \mu \equiv - \dfrac{1}{t}log(I_T/I_0) \),</p>
+	<p>XAS measurements therefore enable us to plot the dimensionless quantity \( \mu t \) as a function of energy.</p>
+	<p>Eris characterizes three systematic errors in XAS measurements. The first occurs when a percentage of x-rays misses the sample entirely; this percentage is denoted by <b>alpha</b>. The second error has to do with unexpected abberations in the sample thickness <b>\( t \)</b>. The third error occurs when the x-rays corresponding to one beam energy accidentally influence the value of the measurement at a different beam energy; we assume this takes place as a Lorentzian broadening of full width at half maximum <b>FWHM</b>. All three of these systematic errors can influence XAS measurements to some degree.</p>
+	<p>See the numerical simulation below, which plots \( \mu t \) as a function of energy for a sample of the chemical compound \( V_2 O_5 \). The blue curve is real experimental data, and the red curve is what that data <i>would</i> have looked like if there had been systematic errors in the measurement.
+  </div>
+
   <div class="wrapper" id="wrapperID">
 
 	<input type="file" id="myFile" class="filestyle"/>
 
-	<div style="text-align:right"> <a href="https://xas-eris.com/V2O5.txt">Click here</a> to view an example .txt file </div>
+	<div style="text-align:right"> <a href="https://xas-eris.com/V2O5.txt">Click here</a> to view example data </div>
 
     <aside id="init-block">
     <section class="file-marker">

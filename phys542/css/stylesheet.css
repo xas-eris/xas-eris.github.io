@@ -90,6 +90,7 @@ input[type=number] {
   width: 45%;
   float: left;
   border-radius: 5px;
+  margin-bottom: 40px;
 }
 
 #wrapperID {
