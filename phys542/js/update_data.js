@@ -187,7 +187,7 @@ for (var i = 0; i < energy.length ; i++) {
 ////////////////////////////////////////////////////////////////////// CONVOLUTION:
 if (document.getElementById('lorCheck').checked) {
 
-  // Create a list of thicknessFactor-dependent, and alpha-dependent, simulated IT data:
+  // Create a list of thickness-dependent, and alpha-dependent, simulated IT data:
   var simulatedITList = [];
   for (var i = 0; i < energy.length; i++) {
 	simulatedITList.push( alpha * i0[i] + (1-alpha) * i0[i] * Math.pow(Math.E, - mu_t_input[i] ) );
@@ -195,9 +195,6 @@ if (document.getElementById('lorCheck').checked) {
 
   ////////////////////////////////////////////////////////////////////// CASE 1 - NO INTERPOLATION:
   if (document.getElementById('chk1').checked) {
-	function add(accumulator, a) {
-	    return accumulator + a;
-	}
 
 	mu_t_output = [];
 	for (var i=0; i < energy.length; i++) {
