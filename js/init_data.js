@@ -31,7 +31,7 @@ function getEnergyIndex(eList,eVal) {
             }
         });
 
-	if (index == -1 ) {index = NaN; window.log('error: energy value out-of-range');}
+	if (index == -1 ) {index = NaN; window.log('error: energy value out-of-range')};
 
 	return index;
 }
