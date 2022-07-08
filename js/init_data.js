@@ -112,7 +112,7 @@ $(document).ready(function(){
 	});
 
   var request = new XMLHttpRequest();
-  request.open('GET', "https://xas-eris.com/V2O5.txt", true);
+  request.open('GET', "https://xas-eris.online/V2O5.txt", true);
   request.responseType = 'blob';
 
   request.onload = function () {
