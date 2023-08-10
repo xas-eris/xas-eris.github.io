@@ -142,7 +142,7 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
-$("#e1,#lam1,#e2,#lam2,#thicknessFactorSlider,#thicknessFactorInput,#alphaSlider,#alphaInput,#lorCheck,#lorentzianSlider,#lorentzianInput,#chk1,#chk2,#chk3,#preEdgeInput").on('input', function(e) { 
+$("#e1,#lam1,#e2,#lam2,#thicknessFactorSlider,#thicknessFactorInput,#alphaSlider,#alphaInput,#lorCheck,#lorentzianSlider,#lorentzianInput,#chk1,#chk2,#normCheck,#normEnergyInput1,#normEnergyInput2,#preEdgeInput").on('input', function(e) { 
 
 lastScroll = getScroll(); //we will need this info at the very end...
 
@@ -169,7 +169,9 @@ lambda1 = Number(document.getElementById("lam1").value);
 lambda2 = Number(document.getElementById("lam2").value);
 thickness = Number(document.getElementById("thicknessFactorInput").value);
 alpha = Number(document.getElementById("alphaInput").value) / 100;	
-fwhm = Number(document.getElementById("lorentzianInput").value);
+fwhm = Number(document.getElementById("lorentzianInput").value);	
+normE1 = Number(document.getElementById("normEnergyInput1").value);
+normE2 = Number(document.getElementById("normEnergyInput2").value);
 
 var energyIndex1 = getEnergyIndex(energy,energy1);
 var mu_t_E1 = mu_t[energyIndex1];
@@ -274,10 +276,6 @@ if (document.getElementById('lorCheck').checked) {
             // calculate mu_t:
             mu_t_output.push( Math.log( i0accumulator / iTaccumulator ) );
         }
-  ////////////////////////////////////////////////////////////////////// CASE 3 - SPLINE INTERPOLATION:
-  } else if (document.getElementById('chk3').checked) {
-	mu_t_output = Array(energy.length).fill(0);
-	window.alert('spline interpolation has not yet been implemented');
   }
 
 ////////////////////////////////////////////////////////////////////// NO CONVOLUTION:
@@ -288,6 +286,13 @@ if (document.getElementById('lorCheck').checked) {
 		mu_t_output.push(muValue);
 	}
 }
+////////////////////////////////////////////////////////////////////// NORMALIZE:
+
+if(document.getElementById('normCheck').checked) {
+	normalize(energy,mu_t_input,normE1,normE2,energy1,thickness,lambda1);
+	normalize(energy,mu_t_output,normE1,normE2,energy1,thickness,lambda1);
+}
+
 ////////////////////////////////////////////////////////////////////// TIME TO PLOT:
 
 source = new Bokeh.ColumnDataSource({

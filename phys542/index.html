@@ -26,21 +26,19 @@
 <body>
 
 <h1 style="color:white; text-align:center; font-size:300%; font-family: monospace; font-style: italic"> e r i s </h1>
-<h1 style="color:white; text-align:center; font-size:300%; font-family: monospace; font-style: italic"> PHYS 542 - project #1 </h1>
 
 <div class="centering_container">
 
   <div class="wrapper" style="color:white;">
+	<h1 style="color:white; text-align:center; font-family: monospace;">Introduction</h1>
 	<p>Welcome to Eris - a diagnostic and educational tool for simulating the effects of systematic errors in x-ray absorption spectroscopy (XAS) experiments. XAS is a measurement used to understand the molecular structure of materials. It works like this: a beam of x-rays is aimed at a sample material of thickness \( t \); some x-rays penetrate the sample while others are absorbed into it. The laws of quantum mechanics predict that the number of penetrating x-rays divided by the number of x-rays in the original beam (denoted \( I_T/I_0 \)) depends sensitively on both the energy of the incident x-ray beam and the sample's molecular structure. By measuring \( I_T \) and \( I_0 \) at many different beam energies for a particular sample, detailed information about the sample's molecular structure can be obtained and encoded in a plot of \( -log(I_T/I_0) \) versus beam energy. In terms of the <i>absorption coefficient</i>,</p>
 	<p style="text-align:center">\( \mu \equiv - \dfrac{1}{t}log(I_T/I_0) \),</p>
 	<p>XAS measurements therefore enable us to plot the dimensionless quantity \( \mu t \) as a function of energy.</p>
 	<p>Eris characterizes three systematic errors in XAS measurements. The first occurs when a percentage of x-rays misses the sample entirely; this percentage is denoted by <b>alpha</b>. The second error has to do with unexpected abberations in the sample thickness <b>\( t \)</b>. The third error occurs when the x-rays corresponding to one beam energy accidentally influence the value of the measurement at a different beam energy; we assume this takes place as a Lorentzian broadening of full width at half maximum <b>FWHM</b>. All three of these systematic errors can influence XAS measurements to some degree.</p>
 	<p>See the numerical simulation below, which plots \( \mu t \) as a function of energy for a sample of the chemical compound \( V_2 O_5 \). You can see the raw data set <a href="https://xas-eris.com/V2O5.txt">here</a>. (Please note that \( \lambda \equiv 1/\mu \), called the <i>attenuation length</i>, is initialized at two specific energy-values in order to scale the vertical axis to a physically meaningful range; for the purpose of this project it need not be adjusted.) The blue curve is real experimental data, and the red curve is what that data <i>would</i> have looked like had there been systematic errors in the measurement.</p>
-	<p>The convolution step can be performed in a number of different ways; hence, as has been often repeated in PHYS 542, a choice needs to be made. In particular, since the experimental data need not be evenly spaced on the energy-axis, it may be sensible to first interpolate the data so as to perform the convolution on an evenly spaced grid. Otherwise, convolution might erroneously skew the data in a way that is related to the inconsistency of horizontal spacing. I wanted to test this hypothesis, and therefore tried doing the convolution both with and without interpolation. In the future I also hope to test between different <i>kinds</i> of interpolation, such as between linear and spline interpolations.</p>
-	<p>The results can be seen most clearly by enabling Lorentzian broadening and choosing a meaningfully sized <b>FWHM</b> (choose, say, <b>FWHM </b>\( = 4\) eV, keeping <b>alpha</b> \( =0 \) and \( t=1 \)) then using the buttons to switch between a mode using no interpolation and one that uses linear interpolation. A slight change can be observed, especially in the region around 5440 eV. When interpolation is turned off, an erroneous feature arises near 5440 eV, which we can be sure is illegitimate - not a real consequence of performing the convolution - since Lorentzian convolution certainly could not give rise to such a feature in that location. (Lorentzian convolution tends to 'smooth out' a data set; it does not typically create new features, and certainly not for our data set with <b>FWHM</b> \(\approx 4\) eV.) It turns out that the data is approximately 5 times more densely spaced in the energy range from about 5445 to 5465 eV than in other regions; apparently, it is this change in horizontal spacing that accounts for the erroneous behavior near 5440 eV.</p>
-	<p><a href="https://stackoverflow.com/questions/24143320/gaussian-sum-filter-for-irregular-spaced-points">This post</a> on Stackoverflow suggests how irregular spacing could give rise to a potential false positive. The accepted answer in that post does not perform any interpolation. The algorithm it uses is identical to mine in the case of no interpolation, <i>except</i> that its output grid is evenly spaced (even though its input grid is not) whereas both my input and output grids are unevenly spaced. But the spacing of the output grid cannot seem in my imagination by any means to so significantly affect the end result. Thus, that post on Stackoverflow prescribes a solution <i>opposite</i> to what I have seen in this investigation to constitute the preferable procedure for convolving an irregularly spaced data set.</p>
-	<p>This project has suggested that Lorentzian convolution on an irregularly spaced data set encourages some kind of interpolation. Further investigations would attempt the convolution again with no interpolation, but on an evenly-spaced output grid, and would then illustrate comparisons between different interpolation schemes.</p>
-  </div>
+	<p>Feel free to normalize the blue and red curves for easier comparison.</p>
+	<p>When convolving with a Lorentzian, please note that there is some nuance to choosing whether to perform the convolution on unevenly spaced versus interpolated data, described <a href="https://xas-eris.com/interpolation-notes.html">here</a>.</p>
+	</div>
 
   <div class="wrapper" style="background:white; float:right;">
 	<div style="text-align:center"> <img src="img/parratt.PNG" alt="parratt image" width="75%"> </div> </br>
@@ -48,7 +46,7 @@
 	<p>The above experimental data plot, illustrating the often-undesirable effect that a sample's thickness can have on measurements of \( \mu \), came from a paper written by Parratt et. al. in 1957. Eris originated from a desire to numerically simulate the kind of results obtained experimentally by Parratt and others. We extended this to simulate not only Parratt's so-called thickness effect, but also the systematic errors resulting from a nonzero <b>alpha</b>, and Lorentzian broadening.</p>
   </div>
 
-  <div class="wrapper" style="background:white; float:right">
+  <!-- <div class="wrapper" style="background:white;">
   Here's a sample of our JavaScript code, which separately convolves a Lorentzian function with \( I_T \) and \( I_0 \), and does not perform any interpolation of the data. (Typically, each point in the outer loop would have to be normalized at the end of the outer loop, but since we are only interested in the ratio \( I_T/I_0 \), this normalization cancels out so that we can ignore it.) Four arrays in this code deserve describing: <span style="font-family:monospace;">energy</span> contains our energy data; <span style="font-family:monospace;">simulatedITList</span> contains our \( I_T \) data that has already been appropriately adjusted to account for systematic errors in <b>alpha</b> and \( t \); <span style="font-family:monospace;">i0</span> contains our \( I_0 \) data; and <span style="font-family:monospace;">weights</span> contains the Lorentzian function evaluated at each energy value, and with the center of the Lorentzian being shifted horizontally by one data point with each iteration of the outer loop.
   <hr>
 	<div id='code' style="font-family:monospace;">
@@ -72,7 +70,7 @@
 	<hr>
 
   For the case in which an interpolation is performed, this section of the code is identical except that the inner loop performs more iterations - one for each point in the <i>interpolated</i> data - and convolves the Lorentzian with the interpolated versions of <span style="font-family:monospace;">simulatedITList</span> and <span style="font-family:monospace;">i0</span>.
-  </div>
+  </div> -->
 
 </div>
 
@@ -138,7 +136,6 @@
 		
 		<input type="radio" name="interp" id="chk1"><label for="chk1">no interpolation</label>
 		<input type="radio" name="interp" id="chk2" checked><label for="chk2">linear interpolation</label>
-		<input type="radio" name="interp" id="chk3"><label for="chk3">spline interpolation</label>
 		    <div class="slidecontainer">
 		    FWHM
                     <input type="range" class="slider" id="lorentzianSlider" min="0.1" max="10" value="0.1" step="0.01" oninput="this.nextElementSibling.value=this.value" />
@@ -149,6 +146,19 @@
              </div>
     </section>
     </aside>
+
+    <aside id="normalization-block">
+		<section class="file-marker">
+				<div>
+					<div class="box-title">
+						<input type="checkbox" id="normCheck"><label for="normCheck">Enable normalization</label>
+					</div>
+					<div class="box-contents">
+				such that \( \mu\Big( \)<input type="number" id="normEnergyInput2" min="0" max="25000" value="5500" step="0.1" /> \(eV \Big)t - \mu\Big( \)<input type="number" id="normEnergyInput1" min="0" max="25000" value="5365" step="0.1" /> \(eV \Big)t = 1 \).
+					</div>
+				 </div>
+		</section>
+		</aside>
 <!------------------------------------------------------------->
   </div>
 

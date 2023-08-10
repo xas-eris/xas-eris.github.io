@@ -10,11 +10,11 @@
 <link rel="stylesheet" href="css/stylesheet.css" type="text/css" />
 <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 
-<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js"></script>
-<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js"></script>
-<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js"></script>
-<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.0.1.min.js"></script>
-<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-2.0.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.4.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.4.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-gl-1.4.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-api-1.4.0.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -29,11 +29,58 @@
 
 <div class="centering_container">
 
+  <div class="wrapper" style="color:white;">
+	<h1 style="color:white; text-align:center; font-family: monospace;">Introduction</h1>
+	<p>Welcome to Eris - a diagnostic and educational tool for simulating the effects of systematic errors in x-ray absorption spectroscopy (XAS) experiments. XAS is a measurement used to understand the molecular structure of materials. It works like this: a beam of x-rays is aimed at a sample material of thickness \( t \); some x-rays penetrate the sample while others are absorbed into it. The laws of quantum mechanics predict that the number of penetrating x-rays divided by the number of x-rays in the original beam (denoted \( I_T/I_0 \)) depends sensitively on both the energy of the incident x-ray beam and the sample's molecular structure. By measuring \( I_T \) and \( I_0 \) at many different beam energies for a particular sample, detailed information about the sample's molecular structure can be obtained and encoded in a plot of \( -log(I_T/I_0) \) versus beam energy. In terms of the <i>absorption coefficient</i>,</p>
+	<p style="text-align:center">\( \mu \equiv - \dfrac{1}{t}log(I_T/I_0) \),</p>
+	<p>XAS measurements therefore enable us to plot the dimensionless quantity \( \mu t \) as a function of energy.</p>
+	<p>Eris characterizes three systematic errors in XAS measurements. The first occurs when a percentage of x-rays misses the sample entirely; this percentage is denoted by <b>alpha</b>. The second error has to do with unexpected abberations in the sample thickness <b>\( t \)</b>. The third error occurs when the x-rays corresponding to one beam energy accidentally influence the value of the measurement at a different beam energy; we assume this takes place as a Lorentzian broadening of full width at half maximum <b>FWHM</b>. All three of these systematic errors can influence XAS measurements to some degree.</p>
+	<p>See the numerical simulation below, which plots \( \mu t \) as a function of energy for a sample of the chemical compound \( V_2 O_5 \). You can see the raw data set <a href="https://xas-eris.com/V2O5.txt">here</a>. (Please note that \( \lambda \equiv 1/\mu \), called the <i>attenuation length</i>, is initialized at two specific energy-values in order to scale the vertical axis to a physically meaningful range; for the purpose of this project it need not be adjusted.) The blue curve is real experimental data, and the red curve is what that data <i>would</i> have looked like had there been systematic errors in the measurement.</p>
+	<p>Feel free to normalize the blue and red curves for easier comparison.</p>
+	<p>When convolving with a Lorentzian, please note that there is some nuance to choosing whether to perform the convolution on unevenly spaced versus interpolated data, described <a href="https://xas-eris.com/interpolation-notes.html">here</a>.</p>
+	</div>
+
+  <div class="wrapper" style="background:white; float:right;">
+	<div style="text-align:center"> <img src="img/parratt.PNG" alt="parratt image" width="75%"> </div> </br>
+	<p style="font-size:10px">Parratt, L. G., et al. "'Thickness Effect' in Absorption Spectra near Absorption Edges." Physical Review, vol. 105, no. 4, Feb. 1957, pp. 1228–32. APS, doi:10.1103/PhysRev.105.1228.</p>
+	<p>The above experimental data plot, illustrating the often-undesirable effect that a sample's thickness can have on measurements of \( \mu \), came from a paper written by Parratt et. al. in 1957. Eris originated from a desire to numerically simulate the kind of results obtained experimentally by Parratt and others. We extended this to simulate not only Parratt's so-called thickness effect, but also the systematic errors resulting from a nonzero <b>alpha</b>, and Lorentzian broadening.</p>
+  </div>
+
+  <!-- <div class="wrapper" style="background:white;">
+  Here's a sample of our JavaScript code, which separately convolves a Lorentzian function with \( I_T \) and \( I_0 \), and does not perform any interpolation of the data. (Typically, each point in the outer loop would have to be normalized at the end of the outer loop, but since we are only interested in the ratio \( I_T/I_0 \), this normalization cancels out so that we can ignore it.) Four arrays in this code deserve describing: <span style="font-family:monospace;">energy</span> contains our energy data; <span style="font-family:monospace;">simulatedITList</span> contains our \( I_T \) data that has already been appropriately adjusted to account for systematic errors in <b>alpha</b> and \( t \); <span style="font-family:monospace;">i0</span> contains our \( I_0 \) data; and <span style="font-family:monospace;">weights</span> contains the Lorentzian function evaluated at each energy value, and with the center of the Lorentzian being shifted horizontally by one data point with each iteration of the outer loop.
+  <hr>
+	<div id='code' style="font-family:monospace;">
+	mu_t_output <font color="teal">=</font> []; </br>
+	<font color="tomato">for</font> (<font color="Fuchsia">var</font> i<font color="teal">=</font>0; i <font color="teal"><</font> energy.length; i<font color="teal">++</font>) {
+		<div>
+		lorCenter <font color="teal">=</font> energy[i];</br>
+		<font color="Fuchsia">var</font> weights <font color="teal">=</font> energy.<font color="blue">map</font>(e <font color="teal">=></font> <font color="blue">lorentzian</font>(e,lorCenter));</br>
+		<font color="Fuchsia">var</font> iTaccumulator <font color="teal">=</font> 0;</br>
+		<font color="Fuchsia">var</font> i0accumulator <font color="teal">=</font> 0;</br>
+		<font color="tomato">for</font> (<font color="Fuchsia">var</font> j<font color="teal">=</font>0; j <font color="teal"><</font> energy.length; j<font color="teal">++</font>) {
+			<div>
+			iTaccumulator <font color="teal">+=</font> weights[j] <font color="teal">*</font> simulatedITList[j];</br>
+			i0accumulator <font color="teal">+=</font> weights[j] <font color="teal">*</font> i0[j];
+			</div>
+		}</br>
+		mu_t_output.<font color="blue">push</font>(<font color="blue">Math</font>.<font color="blue">log</font>( i0accumulator<font color="teal">/</font>iTaccumulator ));
+		</div>
+	</div>
+	}
+	<hr>
+
+  For the case in which an interpolation is performed, this section of the code is identical except that the inner loop performs more iterations - one for each point in the <i>interpolated</i> data - and convolves the Lorentzian with the interpolated versions of <span style="font-family:monospace;">simulatedITList</span> and <span style="font-family:monospace;">i0</span>.
+  </div> -->
+
+</div>
+
+<div class="centering-container">
+
   <div class="wrapper" id="wrapperID">
 
 	<input type="file" id="myFile" class="filestyle"/>
 
-	<div style="text-align:right"> <a href="https://xas-eris.com/V2O5.txt">Click here</a> to view an example .txt file </div>
+	<div style="text-align:right"> <a href="https://xas-eris.com/V2O5.txt">Click here</a> to view example data </div>
 
     <aside id="init-block">
     <section class="file-marker">
@@ -66,7 +113,7 @@
     <section class="file-marker">
             <div>
                 <div class="box-title">
-                    pinhole
+                    alpha
                 </div>
                 <div class="box-contents">
                     <div class="slidecontainer">
@@ -85,7 +132,10 @@
                 <div class="box-title">
                     <input type="checkbox" id="lorCheck"><label for="lorCheck">Enable Lorentzian broadening</label>
                 </div>
-                <div class="box-contents">
+		<div class="box-contents">
+		
+		<input type="radio" name="interp" id="chk1"><label for="chk1">no interpolation</label>
+		<input type="radio" name="interp" id="chk2" checked><label for="chk2">linear interpolation</label>
 		    <div class="slidecontainer">
 		    FWHM
                     <input type="range" class="slider" id="lorentzianSlider" min="0.1" max="10" value="0.1" step="0.01" oninput="this.nextElementSibling.value=this.value" />
@@ -98,17 +148,17 @@
     </aside>
 
     <aside id="normalization-block">
-    <section class="file-marker">
-            <div>
-                <div class="box-title">
-                    <input type="checkbox" id="normCheck"><label for="normCheck">Enable normalization</label>
-                </div>
-                <div class="box-contents">
-		    such that \( \mu\Big( \)<input type="number" id="normEnergyInput2" min="0" max="25000" value="5500" step="0.1" /> \(eV \Big)t - \mu\Big( \)<input type="number" id="normEnergyInput1" min="0" max="25000" value="5365" step="0.1" /> \(eV \Big)t = 1 \).
-                </div>
-             </div>
-    </section>
-    </aside>
+		<section class="file-marker">
+				<div>
+					<div class="box-title">
+						<input type="checkbox" id="normCheck"><label for="normCheck">Enable normalization</label>
+					</div>
+					<div class="box-contents">
+				such that \( \mu\Big( \)<input type="number" id="normEnergyInput2" min="0" max="25000" value="5500" step="0.1" /> \(eV \Big)t - \mu\Big( \)<input type="number" id="normEnergyInput1" min="0" max="25000" value="5365" step="0.1" /> \(eV \Big)t = 1 \).
+					</div>
+				 </div>
+		</section>
+		</aside>
 <!------------------------------------------------------------->
   </div>
 
