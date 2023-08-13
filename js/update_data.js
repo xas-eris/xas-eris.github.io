@@ -145,7 +145,7 @@ $("#myFile").change(function(e){
 //////////////////////////////////////////////////////////////////////
 $("#export-button").on('click',function(e) {
 
-  let csvContent = 'energy (eV),mu*t (blue),mu*t (red)\n';
+  let csvContent = 'energy (eV),undistorted mu*t,simulated mu*t\n';
 
   for (let i = 0; i < energy.length; i++) {
     csvContent += `${energy[i]},${mu_t_input[i]},${mu_t_output[i]}\n`;
