@@ -52,6 +52,20 @@ input[type=number] {
   margin-top: 1.5em;
 }
 
+#export-block section {
+  /* border: 2px solid #c2b27e; */
+  border-radius: 5px;
+  margin-top: 1.5em;
+  text-align: right;
+}
+
+#export-button {
+  background-color: #7a5050;
+  border: 2px solid #7a5050;
+  color: #00c8ff;
+  padding: 0 0.75rem;
+}
+
 /* golden color: #a79046 */
 .file-marker > div {
   padding: 0 5px;

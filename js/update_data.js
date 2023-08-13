@@ -139,6 +139,32 @@ $("#myFile").change(function(e){
 	});
 });
 
+
+//////////////////////////////////////////////////////////////////////
+//                   CODE FOR A FILE EXPORT:                        //
+//////////////////////////////////////////////////////////////////////
+$("#export-button").on('click',function(e) {
+
+  let csvContent = 'energy (eV),mu*t\n';
+
+  for (let i = 0; i < energy.length; i++) {
+    csvContent += `${energy[i]},${mu_t_output[i]}\n`;
+  }
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'eris-export.csv';
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+});
+
 //////////////////////////////////////////////////////////////////////
 // CODE FOR A CHANGE IN ALPHA, THICKNESSFACTOR, OR LORENTZIAN FWHM: //
 //////////////////////////////////////////////////////////////////////
@@ -316,6 +342,6 @@ plot.line({ field: "x" }, { field: "y" }, {
 
 Bokeh.Plotting.show(plot,document.getElementById("plotID"));
 
-window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started. 
+window.scrollTo(lastScroll[0], lastScroll[1]) //scrolls viewport back to the same place we started.
 
 });
