@@ -72,7 +72,12 @@ $("#myFile").change(function(e){
 		}
 	}
 
-	var data = dataStr.slice(carriageReturnIndex+1,dataStr.length - 1);
+	if (dataStr[dataStr.length-1] === "\n") { // checks whether the last character in the .txt data file is a carriage return and defines the string called data appropriately.
+		var data = dataStr.slice(carriageReturnIndex+1,dataStr.length-1);
+	} else {
+		var data = dataStr.slice(carriageReturnIndex+1,dataStr.length);
+	}
+
 	var arrayOfDataLines = data.split('\n');
 	
 	for (var ii = 0; ii < arrayOfDataLines.length ; ii++) {

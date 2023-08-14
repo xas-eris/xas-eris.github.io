@@ -161,7 +161,7 @@ $(document).ready(function(){
 		}
 	}
 
-	var data = dataStr.slice(carriageReturnIndex+1,dataStr.length - 1);
+	var data = dataStr.slice(carriageReturnIndex+1,dataStr.length); // assumes that the final character in the V2O5.txt file is NOT a carriage return.
 	var arrayOfDataLines = data.split('\n');
 	
 	for (var ii = 0; ii < arrayOfDataLines.length ; ii++) {
