@@ -35,64 +35,69 @@ $("#myFile").change(function(e){
 	readFile(myFile, function(e) {
 
 	var dataStr = e.target.result;
-	var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
+	if (myFile.name.slice(-3) === "txt") {
 
-	//find the index of the last pound sign:
-	var poundSearch = '';
-	var j = 0;
-	while (poundSearch !== '#') {
-		j++ ;
-		poundSearch = dataStr[idxBegin + j];
-	}
-	var poundIndex = idxBegin + j;
+		var idxBegin = dataStr.search("#-");//gives the index of the second-to-last pound sign
 
-	//find the index of the carriage return following the last pound sign:
-	var carriageReturnSearch = '';
-	var j = 0;
-	while (carriageReturnSearch !== '\n') {
-		j++ ;
-		carriageReturnSearch = dataStr[poundIndex + j];
-	}
-	var carriageReturnIndex = poundIndex + j;
-
-	var dataHeaderInfo = dataStr.slice(poundIndex,carriageReturnIndex - 1);
-
-	//Look at the header to figure out which columns contain which data:
-	var HeaderList = dataHeaderInfo.split(' ');
-	HeaderList = HeaderList.filter(Boolean);
-	for (var ii = 0; ii < HeaderList.length ; ii++) {
-		if (HeaderList[ii] === "energy") {
-			var energyIndex = ii - 1 ; // the -1 is here to account for the "#" having an index of 0
+		//find the index of the last pound sign:
+		var poundSearch = '';
+		var j = 0;
+		while (poundSearch !== '#') {
+			j++ ;
+			poundSearch = dataStr[idxBegin + j];
 		}
-		else if (HeaderList[ii] === "i0") {
-			var i0Index = ii - 1 ;
-		}
-		else if (HeaderList[ii] === "itrans" || HeaderList[ii] === "itran") {
-			var itransIndex = ii - 1 ;
-		}
-	}
+		var poundIndex = idxBegin + j;
 
-	if (dataStr[dataStr.length-1] === "\n") { // checks whether the last character in the .txt data file is a carriage return and defines the string called data appropriately.
-		var data = dataStr.slice(carriageReturnIndex+1,dataStr.length-1);
+		//find the index of the carriage return following the last pound sign:
+		var carriageReturnSearch = '';
+		var j = 0;
+		while (carriageReturnSearch !== '\n') {
+			j++ ;
+			carriageReturnSearch = dataStr[poundIndex + j];
+		}
+		var carriageReturnIndex = poundIndex + j;
+
+		var dataHeaderInfo = dataStr.slice(poundIndex,carriageReturnIndex - 1);
+
+		//Look at the header to figure out which columns contain which data:
+		var HeaderList = dataHeaderInfo.split(' ');
+		HeaderList = HeaderList.filter(Boolean);
+		for (var ii = 0; ii < HeaderList.length ; ii++) {
+			if (HeaderList[ii] === "energy") {
+				var energyIndex = ii - 1 ; // the -1 is here to account for the "#" having an index of 0
+			}
+			else if (HeaderList[ii] === "i0") {
+				var i0Index = ii - 1 ;
+			}
+			else if (HeaderList[ii] === "itrans" || HeaderList[ii] === "itran") {
+				var itransIndex = ii - 1 ;
+			}
+		}
+
+		if (dataStr[dataStr.length-1] === "\n") { // checks whether the last character in the .txt file is a carriage return and defines the string called data appropriately.
+			var data = dataStr.slice(carriageReturnIndex+1,dataStr.length-1);
+		} else {
+			var data = dataStr.slice(carriageReturnIndex+1,dataStr.length);
+		}
+
+		var arrayOfDataLines = data.split('\n');
+		
+		for (var ii = 0; ii < arrayOfDataLines.length ; ii++) {
+			var aLineList = arrayOfDataLines[ii].split(' ');
+			aLineList = aLineList.filter(Boolean);
+
+			var energyValue = Number(aLineList[energyIndex]);
+			energy.push(energyValue);
+			var i0Value = Number(aLineList[i0Index]);
+			i0.push(i0Value);
+			var itransValue = Number(aLineList[itransIndex]);
+			iT.push(itransValue);
+
+			var muValue = Math.log(i0Value/itransValue);
+			mu_t.push(muValue);
+		}
 	} else {
-		var data = dataStr.slice(carriageReturnIndex+1,dataStr.length);
-	}
-
-	var arrayOfDataLines = data.split('\n');
-	
-	for (var ii = 0; ii < arrayOfDataLines.length ; ii++) {
-		var aLineList = arrayOfDataLines[ii].split(' ');
-		aLineList = aLineList.filter(Boolean);
-
-		var energyValue = Number(aLineList[energyIndex]);
-		energy.push(energyValue);
-		var i0Value = Number(aLineList[i0Index]);
-		i0.push(i0Value);
-		var itransValue = Number(aLineList[itransIndex]);
-		iT.push(itransValue);
-
-		var muValue = Math.log(i0Value/itransValue);
-		mu_t.push(muValue);
+		alert("csv compatibility not yet supported")
 	}
 
 ///////////////////////////////////////////////
