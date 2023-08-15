@@ -96,8 +96,10 @@ $("#myFile").change(function(e){
 			var muValue = Math.log(i0Value/itransValue);
 			mu_t.push(muValue);
 		}
+	} else if (myFile.name.slice(-3) === "csv") {
+		alert("csv compatibility not yet supported");
 	} else {
-		alert("csv compatibility not yet supported")
+		alert("Eris only accepts .csv or .txt files. Please upload a file with a filename ending in either .txt or .csv");
 	}
 
 ///////////////////////////////////////////////
